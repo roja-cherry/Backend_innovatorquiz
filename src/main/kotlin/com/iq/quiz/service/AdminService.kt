@@ -29,7 +29,7 @@ class AdminService(
 
         val savedQuiz = quizRepository.save(quiz)
 
-        val questions = mutableListOf<Question>()
+        var questions = mutableListOf<Question>()
 
         file.inputStream.use { inputStream ->
             val workbook = WorkbookFactory.create(inputStream)
@@ -65,20 +65,21 @@ class AdminService(
                 questions.add(question)
             }
 
-            questionRepository.saveAll(questions)
+            questions = questionRepository.saveAll(questions)
             workbook.close()
         }
 
         val quizDto = QuizDTO(
+            quizId = savedQuiz.quizId,
             quizName = savedQuiz.quizName,
             duration = savedQuiz.duration,
             status = savedQuiz.status,
             createdByUserId = savedQuiz.createdBy ?: UUID.randomUUID() // or handle null properly
         )
 
-        val questionDtos = questions.map {
+        val questionDTOs = questions.map {
             QuestionDTO(
-                quizId = savedQuiz.quizId,
+                questionId = it.questionId,
                 question = it.question,
                 option1 = it.option1,
                 option2 = it.option2,
@@ -88,6 +89,6 @@ class AdminService(
             )
         }
 
-        return QuizWithQuestionsDto(quiz = quizDto, questions = questionDtos)
+        return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
     }
 }

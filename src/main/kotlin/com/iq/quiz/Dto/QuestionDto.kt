@@ -1,7 +1,8 @@
 package com.iq.quiz.Dto
 
 data class QuestionDTO(
-    val quizId: String?,
+//    val quizId: String?,
+    val questionId: String?,
     val question: String,
     val option1: String,
     val option2: String,
