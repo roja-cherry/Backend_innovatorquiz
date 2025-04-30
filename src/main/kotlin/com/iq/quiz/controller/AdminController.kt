@@ -18,6 +18,6 @@ class AdminController(
         @RequestParam("duration") duration: Int
     ): ResponseEntity<String> {
         adminService.processQuizFile(file, quizName, duration)
-        return ResponseEntity.ok("Quiz processed successfully! Check console output.")
+        return ResponseEntity.ok("Quiz processed successfully!")
     }
 }
