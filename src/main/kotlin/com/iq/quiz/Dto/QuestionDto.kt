@@ -1,9 +1,7 @@
 package com.iq.quiz.Dto
 
-import java.util.*
-
 data class QuestionDTO(
-    val quizId: UUID,
+    val quizId: String?,
     val question: String,
     val option1: String,
     val option2: String,
