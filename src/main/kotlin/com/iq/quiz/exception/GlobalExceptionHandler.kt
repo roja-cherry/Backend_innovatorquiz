@@ -12,7 +12,7 @@ class GlobalExceptionHandler {
 
 
     @ExceptionHandler(FileFormatException::class)
-    fun handleFileFormatExcepton(ex : FileFormatException) : ResponseEntity<ErrorResponse>{
+    fun handleFileFormatException(ex : FileFormatException) : ResponseEntity<ErrorResponse>{
         val error = ErrorResponse(
             timestamp = LocalDateTime.now(),
             status = HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(),

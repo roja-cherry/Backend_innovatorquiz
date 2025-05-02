@@ -1,6 +1,5 @@
 package com.iq.quiz.exception
 
-import java.sql.Timestamp
 import java.time.LocalDateTime
 
 data class ErrorResponse (
