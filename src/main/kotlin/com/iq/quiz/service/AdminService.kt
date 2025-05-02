@@ -26,11 +26,9 @@ class AdminService(
             status = QuizStatus.INACTIVE,
             createdBy = null
         )
-
         val savedQuiz = quizRepository.save(quiz)
 
         var questions = mutableListOf<Question>()
-
         file.inputStream.use { inputStream ->
             val workbook = WorkbookFactory.create(inputStream)
             val sheet = workbook.getSheetAt(0)
@@ -61,7 +59,6 @@ class AdminService(
                     option4 = optionD,
                     correctAnswer = correctAnswer
                 )
-
                 questions.add(question)
             }
 
