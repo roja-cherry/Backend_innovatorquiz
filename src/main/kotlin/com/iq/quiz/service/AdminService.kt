@@ -9,8 +9,10 @@ import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.Repository.QuestionRepository
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.exception.FileFormatException
+import com.iq.quiz.exception.QuizNotFoundException
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
@@ -109,5 +111,30 @@ class AdminService(
         }
 
         return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
+    }
+
+
+
+
+    fun quizToQuizDto(quiz: Quiz): QuizDTO {
+        return QuizDTO(
+            quizId = quiz.quizId,
+            quizName = quiz.quizName,
+            duration = quiz.duration,
+            status = quiz.status,
+            createdByUserId = quiz.createdBy ?: ""
+        )
+    }
+
+    fun questionToQuestionsDto(question: Question): QuestionDTO {
+        return QuestionDTO(
+            questionId = question.questionId,
+            question = question.question,
+            option1 = question.option1,
+            option2 = question.option2,
+            option3 = question.option3,
+            option4 = question.option4,
+            correctAnswer = question.correctAnswer
+        )
     }
 }
