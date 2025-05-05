@@ -23,4 +23,14 @@ class AdminController(
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
+    @PutMapping("/{id}")
+    fun editQuiz(
+        @RequestParam("file") file: MultipartFile?,
+        @RequestParam("quizName") quizName: String?,
+        @RequestParam("duration") duration: Int?,
+        @PathVariable id: String
+    ) : ResponseEntity<QuizWithQuestionsDto> {
+        val response = adminService.editQuiz(file, quizName, duration, id)
+        return ResponseEntity.ok(response)
+    }
 }
