@@ -35,9 +35,9 @@ class AdminController(
         return ResponseEntity.ok(response)
     }
 
-    @GetMapping("/{quizid}")
+    @GetMapping("/{quizId}")
     fun getQuizDto(
-        @PathVariable("quizid") quizId: String
+        @PathVariable("quizId") quizId: String
     ) :ResponseEntity<QuizDTO>{
         val response = adminService.getQuizDto(quizId)
         return ResponseEntity.status(HttpStatus.OK).body(response)
