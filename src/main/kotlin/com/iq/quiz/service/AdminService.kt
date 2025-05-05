@@ -115,7 +115,7 @@ class AdminService(
         return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
     }
 
-    fun getQuizDtoService(quizId: String): QuizDTO? {
+    fun getQuizDto(quizId: String): QuizDTO? {
         val quiz= quizRepository.findByQuizId(quizId)?:throw ResponseStatusException(HttpStatus.NOT_FOUND,"Quiz Not Found")
         return (quizToQuizDto(quiz))
     }
