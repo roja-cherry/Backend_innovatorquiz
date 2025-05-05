@@ -1,5 +1,6 @@
 package com.iq.quiz.controller
 
+import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
 import com.iq.quiz.service.AdminService
 import org.springframework.http.HttpStatus
@@ -33,4 +34,13 @@ class AdminController(
         val response = adminService.editQuiz(file, quizName, duration, id)
         return ResponseEntity.ok(response)
     }
+
+    @GetMapping("/{quizid}")
+    fun getQuizDto(
+        @PathVariable("quizid") quizId: String
+    ) :ResponseEntity<QuizDTO>{
+        val response = adminService.getQuizDtoService(quizId)
+        return ResponseEntity.status(HttpStatus.OK).body(response)
+    }
+
 }

@@ -11,9 +11,11 @@ import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.exception.FileFormatException
 import com.iq.quiz.exception.QuizNotFoundException
 import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @Service
@@ -113,6 +115,11 @@ class AdminService(
         return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
     }
 
+    fun getQuizDtoService(quizId: String): QuizDTO? {
+        val quiz= quizRepository.findByQuizId(quizId)?:throw ResponseStatusException(HttpStatus.NOT_FOUND,"Quiz Not Found")
+        return (quizToQuizDto(quiz))
+    }
+
     @Transactional
     fun editQuiz(
         file: MultipartFile?,
@@ -121,7 +128,7 @@ class AdminService(
         id: String
     ): QuizWithQuestionsDto {
         val quiz = quizRepository.findById(id)
-            .orElseThrow({QuizNotFoundException("Quiz not found")})
+            .orElseThrow({ QuizNotFoundException("Quiz not found") })
         val updatedQuiz = quiz.copy(
             quizName = quizName ?: quiz.quizName,
             duration = duration ?: quiz.duration
