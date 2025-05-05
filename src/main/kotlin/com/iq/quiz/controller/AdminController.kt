@@ -39,7 +39,7 @@ class AdminController(
     fun getQuizDto(
         @PathVariable("quizid") quizId: String
     ) :ResponseEntity<QuizDTO>{
-        val response = adminService.getQuizDtoService(quizId)
+        val response = adminService.getQuizDto(quizId)
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 
