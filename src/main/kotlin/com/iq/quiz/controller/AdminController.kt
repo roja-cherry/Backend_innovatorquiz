@@ -33,12 +33,4 @@ class AdminController(
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 
-
-    @PutMapping("/update")
-    fun updateQuiz(
-        @RequestParam("quizid") quizId:String
-    ) :ResponseEntity<QuizDTO>{
-
-    }
-
 }
