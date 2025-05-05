@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import java.util.UUID
 
 @RestController
 @RequestMapping("/api/admin/quiz")
@@ -23,6 +22,17 @@ class AdminController(
     ): ResponseEntity<QuizWithQuestionsDto> {
         val response = adminService.processQuizFile(file, quizName, duration)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
+    }
+
+    @PutMapping("/{id}")
+    fun editQuiz(
+        @RequestParam("file") file: MultipartFile?,
+        @RequestParam("quizName") quizName: String?,
+        @RequestParam("duration") duration: Int?,
+        @PathVariable id: String
+    ) : ResponseEntity<QuizWithQuestionsDto> {
+        val response = adminService.editQuiz(file, quizName, duration, id)
+        return ResponseEntity.ok(response)
     }
 
     @GetMapping("/{quizid}")

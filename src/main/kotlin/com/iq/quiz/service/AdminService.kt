@@ -9,9 +9,11 @@ import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.Repository.QuestionRepository
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.exception.FileFormatException
+import com.iq.quiz.exception.QuizNotFoundException
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
@@ -118,6 +120,35 @@ class AdminService(
         return (quizToQuizDto(quiz))
     }
 
+    @Transactional
+    fun editQuiz(
+        file: MultipartFile?,
+        quizName: String?,
+        duration: Int?,
+        id: String
+    ): QuizWithQuestionsDto {
+        val quiz = quizRepository.findById(id)
+            .orElseThrow({ QuizNotFoundException("Quiz not found") })
+        val updatedQuiz = quiz.copy(
+            quizName = quizName ?: quiz.quizName,
+            duration = duration ?: quiz.duration
+        )
+
+        if(file != null) {
+            questionRepository.deleteAllByQuizQuizId(id)
+            val questions = extractQuestionsFromExcel(file, updatedQuiz)
+            questionRepository.saveAll(questions)
+        }
+
+        quizRepository.save(updatedQuiz)
+        val questions = questionRepository.findByQuizQuizId(id)
+        val questionsDto = questions.map { questionToQuestionsDto(it) }
+
+        return QuizWithQuestionsDto(
+            quiz = quizToQuizDto(updatedQuiz),
+            questions = questionsDto
+        )
+    }
 
     fun quizToQuizDto(quiz: Quiz): QuizDTO {
         return QuizDTO(
@@ -139,5 +170,58 @@ class AdminService(
             option4 = question.option4,
             correctAnswer = question.correctAnswer
         )
+    }
+
+    fun extractQuestionsFromExcel(file: MultipartFile, quiz: Quiz) : List<Question> {
+        val questions = mutableListOf<Question>()
+
+        try {
+            file.inputStream.use { inputStream ->
+                val workbook = WorkbookFactory.create(inputStream)
+                val sheet = workbook.getSheetAt(0)
+
+                for ((index, row) in sheet.withIndex()) {
+                    if (index == 0) continue
+
+                    val questionText = row.getCell(0)?.stringCellValue?.trim()
+                        ?: throw FileFormatException("Missing question text in row ${index + 1}")
+                    val optionA = row.getCell(1)?.stringCellValue?.trim()
+                        ?: throw FileFormatException("Missing option 1 in row ${index + 1}")
+                    val optionB = row.getCell(2)?.stringCellValue?.trim()
+                        ?: throw FileFormatException("Missing option 2 in row ${index + 1}")
+                    val optionC = row.getCell(3)?.stringCellValue?.trim()
+                        ?: throw FileFormatException("Missing option 3 in row ${index + 1}")
+                    val optionD = row.getCell(4)?.stringCellValue?.trim()
+                        ?: throw FileFormatException("Missing option 4 in row ${index + 1}")
+
+                    val correctAnswerCell = row.getCell(5)
+                        ?: throw FileFormatException("Missing correct answer in row ${index + 1}")
+                    val correctAnswer = when (correctAnswerCell.cellType) {
+                        org.apache.poi.ss.usermodel.CellType.STRING ->
+                            correctAnswerCell.stringCellValue.trim()
+                        org.apache.poi.ss.usermodel.CellType.NUMERIC ->
+                            correctAnswerCell.numericCellValue.toInt().toString()
+                        else -> throw FileFormatException("Invalid correct answer format in row ${index + 1}")
+                    }
+
+                    val question = Question(
+                        quiz = quiz,
+                        question = questionText,
+                        option1 = optionA,
+                        option2 = optionB,
+                        option3 = optionC,
+                        option4 = optionD,
+                        correctAnswer = correctAnswer
+                    )
+                    questions.add(question)
+                }
+                workbook.close()
+                return questions
+            }
+        } catch (e: FileFormatException) {
+            throw e
+        } catch (e: Exception) {
+            throw FileFormatException("Error processing file: ${e.localizedMessage}")
+        }
     }
 }
