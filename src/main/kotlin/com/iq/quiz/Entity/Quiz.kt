@@ -25,5 +25,4 @@ data class Quiz(
 
     var publishedAt: LocalDateTime?=null
 
-
 )

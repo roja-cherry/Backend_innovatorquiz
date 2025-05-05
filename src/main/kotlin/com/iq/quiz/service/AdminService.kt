@@ -9,13 +9,9 @@ import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.Repository.QuestionRepository
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.exception.FileFormatException
-import org.apache.coyote.Response
 import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.web.server.ResponseStatusException
 import java.util.*
 
 @Service
@@ -118,5 +114,30 @@ class AdminService(
     fun getQuizDtoService(quizId: String): QuizDTO? {
         val quiz= quizRepository.findByQuizId(quizId)?:throw ResponseStatusException(HttpStatus.NOT_FOUND,"Quiz Not Found")
         return (quiz)
+    }
+
+
+
+
+    fun quizToQuizDto(quiz: Quiz): QuizDTO {
+        return QuizDTO(
+            quizId = quiz.quizId,
+            quizName = quiz.quizName,
+            duration = quiz.duration,
+            status = quiz.status,
+            createdByUserId = quiz.createdBy ?: ""
+        )
+    }
+
+    fun questionToQuestionsDto(question: Question): QuestionDTO {
+        return QuestionDTO(
+            questionId = question.questionId,
+            question = question.question,
+            option1 = question.option1,
+            option2 = question.option2,
+            option3 = question.option3,
+            option4 = question.option4,
+            correctAnswer = question.correctAnswer
+        )
     }
 }

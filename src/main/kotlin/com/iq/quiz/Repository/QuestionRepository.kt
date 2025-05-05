@@ -4,6 +4,6 @@ import com.iq.quiz.Entity.Question
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID
 
-interface QuestionRepository : JpaRepository<Question, UUID> {
-
+interface QuestionRepository : JpaRepository<Question, String> {
+    fun findByQuestionId(id: String): List<Question>
 }
