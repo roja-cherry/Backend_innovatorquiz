@@ -196,22 +196,27 @@ class AdminService(
     }
 
     fun getAllQuizzesForAdmin(
-        isActive:Boolean,
-        search: String?,
-        minDuration: Int?,
+        isActive: Boolean,
         status: QuizStatus?,
-        createdAfter: LocalDateTime?
+        createdWithin: String? // "1m", "3m", "6m", "before6m"
     ): List<QuizDTO> {
-        // Fetch all quizzes
-        val quizzes = quizRepository.findAll()
+        val now = LocalDateTime.now()
 
-        // Apply filters
-        return quizzes.filter { quiz ->
-            (isActive==null || quiz.isActive == isActive) &&
-                    (search == null || quiz.quizName.contains( search , ignoreCase = true)) &&
-                    (minDuration == null || quiz.duration >= minDuration) &&
+        val cutoffDate: LocalDateTime? = when (createdWithin) {
+            "1m" -> now.minusMonths(1)
+            "3m" -> now.minusMonths(3)
+            "6m" -> now.minusMonths(6)
+            "before6m" -> now.minusMonths(6)
+            else -> null
+        }
+
+        return quizRepository.findAll().filter { quiz ->
+            quiz.isActive == isActive &&
                     (status == null || quiz.status == status) &&
-                    (createdAfter == null || quiz.createdAt?.isAfter(createdAfter) == true)
+                    (createdWithin == null || when (createdWithin) {
+                        "before6m" -> quiz.createdAt?.isBefore(cutoffDate) == true
+                        else -> quiz.createdAt?.isAfter(cutoffDate) == true
+                    })
         }.map { quiz ->
             QuizDTO(
                 quizId = quiz.quizId,
