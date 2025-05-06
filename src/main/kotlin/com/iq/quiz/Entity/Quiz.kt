@@ -23,6 +23,6 @@ data class Quiz(
     val createdBy: User? = null,
 
 
-    var publishedAt: LocalDateTime?=null
+    var createdAt: LocalDateTime?=null
 
 )
