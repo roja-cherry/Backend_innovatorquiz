@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -32,64 +33,13 @@ class AdminService(
             quizName = quizName,
             duration = duration,
             status = QuizStatus.INACTIVE,
-            createdBy = null
+            createdBy = null,
+            createdAt = LocalDateTime.now()
         )
         val savedQuiz = quizRepository.save(quiz)
 
-        val questions = mutableListOf<Question>()
-
-        try {
-            file.inputStream.use { inputStream ->
-                val workbook = WorkbookFactory.create(inputStream)
-                val sheet = workbook.getSheetAt(0)
-
-                for ((index, row) in sheet.withIndex()) {
-                    if (index == 0) continue // Skip header row
-
-                    // Validate row cells
-                    val questionText = row.getCell(0)?.stringCellValue?.trim()
-                        ?: throw FileFormatException("Missing question text in row ${index + 1}")
-                    val optionA = row.getCell(1)?.stringCellValue?.trim()
-                        ?: throw FileFormatException("Missing option A in row ${index + 1}")
-                    val optionB = row.getCell(2)?.stringCellValue?.trim()
-                        ?: throw FileFormatException("Missing option B in row ${index + 1}")
-                    val optionC = row.getCell(3)?.stringCellValue?.trim()
-                        ?: throw FileFormatException("Missing option C in row ${index + 1}")
-                    val optionD = row.getCell(4)?.stringCellValue?.trim()
-                        ?: throw FileFormatException("Missing option D in row ${index + 1}")
-
-                    val correctAnswerCell = row.getCell(5)
-                        ?: throw FileFormatException("Missing correct answer in row ${index + 1}")
-                    val correctAnswer = when (correctAnswerCell.cellType) {
-                        org.apache.poi.ss.usermodel.CellType.STRING ->
-                            correctAnswerCell.stringCellValue.trim()
-
-                        org.apache.poi.ss.usermodel.CellType.NUMERIC ->
-                            correctAnswerCell.numericCellValue.toInt().toString()
-
-                        else -> throw FileFormatException("Invalid correct answer format in row ${index + 1}")
-                    }
-
-                    val question = Question(
-                        quiz = savedQuiz,
-                        question = questionText,
-                        option1 = optionA,
-                        option2 = optionB,
-                        option3 = optionC,
-                        option4 = optionD,
-                        correctAnswer = correctAnswer
-                    )
-                    questions.add(question)
-                }
-
-                questionRepository.saveAll(questions)
-                workbook.close()
-            }
-        } catch (e: FileFormatException) {
-            throw e
-        } catch (e: Exception) {
-            throw FileFormatException("Error processing file: ${e.localizedMessage}")
-        }
+        val questions = extractQuestionsFromExcel(file, savedQuiz)
+        questionRepository.saveAll(questions)
 
         val quizDto = QuizDTO(
             quizId = savedQuiz.quizId,
