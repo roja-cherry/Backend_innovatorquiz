@@ -1,16 +1,21 @@
 spring.application.name=iq-quiz
 
+spring.datasource.url=jdbc:postgresql://localhost:5432/<name-of-db>
 
-spring.datasource.url=jdbc:postgresql://localhost:5432/quiz_app
-spring.datasource.username=postgres
-spring.datasource.password=Root123
+spring.datasource.username=<username-of-db>
+
+spring.datasource.password=<db-password>
+
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 # --- Hibernate / JPA Configuration ---
+
 spring.jpa.hibernate.ddl-auto=update
+
 spring.jpa.show-sql=true
+
 spring.jpa.properties.hibernate.format_sql=true
 
 logging.level.org.hibernate.SQL=warn
-logging.level.org.hibernate.type.descriptor.sql.BasicBinder=warn
 
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder=warn

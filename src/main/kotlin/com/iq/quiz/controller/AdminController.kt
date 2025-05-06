@@ -46,7 +46,17 @@ class AdminController(
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 
+    @GetMapping("/quizzes/search")
+    fun searchQuizzes(@RequestParam keyword: String): ResponseEntity<List<QuizDTO>> {
+        val results = adminService.searchQuizzes(keyword)
+        return ResponseEntity.ok(results)
+    }
 
+    @DeleteMapping("/quizzes/{id}")
+    fun deleteQuiz(@PathVariable id: String): ResponseEntity<String> {
+        adminService.deleteQuizById(id)  // Calls the service method to delete the quiz
+        return ResponseEntity.ok("Quiz deleted successfully")  // Returns a success message
+    }
 
 
 

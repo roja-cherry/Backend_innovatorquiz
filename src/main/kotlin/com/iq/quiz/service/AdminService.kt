@@ -225,4 +225,23 @@ class AdminService(
     }
 
 
+
+    //fun for search
+
+    fun searchQuizzes(keyword: String): List<QuizDTO> {
+        val results = quizRepository.searchByKeyword(keyword)
+        return results.map { quizToQuizDto(it) }
+    }
+
+    //Delete
+    @Transactional
+    fun deleteQuizById(quizId: String) {
+        val quiz = quizRepository.findByQuizId(quizId)
+            ?: throw QuizNotFoundException("Quiz not found with ID: $quizId")  // If quiz not found, throw exception
+
+        questionRepository.deleteAllByQuizQuizId(quizId)
+        quizRepository.delete(quiz)
+    }
+
+
 }
