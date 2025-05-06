@@ -23,7 +23,9 @@ data class Quiz(
     val createdBy: User? = null,
 
 
-    var createdAt: LocalDateTime?=null
+    var createdAt: LocalDateTime?=null,
+
+    var isActive:Boolean
 
 )
 

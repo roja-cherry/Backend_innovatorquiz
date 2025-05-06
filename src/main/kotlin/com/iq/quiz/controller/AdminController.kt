@@ -60,6 +60,7 @@ class AdminController(
 
     @GetMapping("/quizzes")
     fun getAllQuizzesForAdmin(
+        @RequestParam(required = false) isActive:Boolean,
         @RequestParam(required = false) search: String?,                     // search by name
         @RequestParam(required = false) minDuration: Int?,                  // filter by min duration
         @RequestParam(required = false) status: QuizStatus?,                // filter by status
@@ -67,8 +68,9 @@ class AdminController(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         createdAfter: LocalDateTime?                                        // filter by createdAt
     ): List<QuizDTO> {
-        return adminService.getAllQuizzesForAdmin(search, minDuration, status, createdAfter)
+        return adminService.getAllQuizzesForAdmin(isActive,search, minDuration, status, createdAfter)
     }
+
 
 
 

@@ -37,7 +37,9 @@ class AdminService(
             duration = duration,
             status = QuizStatus.CREATED,
             createdBy = null,
-            createdAt = LocalDateTime.now()
+            createdAt = LocalDateTime.now(),
+            isActive = false
+
         )
         val savedQuiz = quizRepository.save(quiz)
 
@@ -50,7 +52,9 @@ class AdminService(
             duration = savedQuiz.duration,
             status = savedQuiz.status,
             createdBy = null, // No user mapping for now, setting to empty string
-            createdAt = savedQuiz.createdAt
+            createdAt = savedQuiz.createdAt,
+            isActive = savedQuiz.isActive
+
         )
 
         val questionDTOs = questions.map {
@@ -119,7 +123,8 @@ class AdminService(
                     role = it.role
                 )
             },
-            createdAt = quiz.createdAt
+            createdAt = quiz.createdAt,
+            isActive = quiz.isActive
         )
     }
 
@@ -191,6 +196,7 @@ class AdminService(
     }
 
     fun getAllQuizzesForAdmin(
+        isActive:Boolean,
         search: String?,
         minDuration: Int?,
         status: QuizStatus?,
@@ -201,7 +207,8 @@ class AdminService(
 
         // Apply filters
         return quizzes.filter { quiz ->
-            (search == null || quiz.quizName.contains(search, ignoreCase = true)) &&
+            (isActive==null || quiz.isActive == isActive) &&
+                    (search == null || quiz.quizName.contains( search , ignoreCase = true)) &&
                     (minDuration == null || quiz.duration >= minDuration) &&
                     (status == null || quiz.status == status) &&
                     (createdAfter == null || quiz.createdAt?.isAfter(createdAfter) == true)
@@ -211,6 +218,7 @@ class AdminService(
                 quizName = quiz.quizName,
                 duration = quiz.duration,
                 status = quiz.status,
+                isActive = quiz.isActive,
                 createdBy = quiz.createdBy?.let { user ->
                     UserDTO(
                         username = user.userName,
