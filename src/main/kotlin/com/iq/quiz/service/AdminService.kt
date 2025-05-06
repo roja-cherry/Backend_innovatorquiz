@@ -35,7 +35,7 @@ class AdminService(
         val quiz = Quiz(
             quizName = quizName,
             duration = duration,
-            status = QuizStatus.INACTIVE,
+            status = QuizStatus.CREATED,
             createdBy = null,
             createdAt = LocalDateTime.now()
         )
