@@ -182,10 +182,11 @@ class AdminService(
     }
 
     //Delete
+
     @Transactional
     fun deleteQuizById(quizId: String) {
         val quiz = quizRepository.findByQuizId(quizId)
-            ?: throw QuizNotFoundException("Quiz not found with ID: $quizId")  // If quiz not found, throw exception
+            ?: throw QuizNotFoundException("Quiz not found with ID: $quizId")
 
         questionRepository.deleteAllByQuizQuizId(quizId)
         quizRepository.delete(quiz)
