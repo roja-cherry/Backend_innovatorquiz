@@ -3,9 +3,11 @@ package com.iq.quiz.service
 import com.iq.quiz.Dto.QuestionDTO
 import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
+import com.iq.quiz.Dto.UserDTO
 import com.iq.quiz.Entity.Question
 import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.QuizStatus
+import com.iq.quiz.Entity.User
 import com.iq.quiz.Repository.QuestionRepository
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.exception.FileFormatException
@@ -47,7 +49,8 @@ class AdminService(
             quizName = savedQuiz.quizName,
             duration = savedQuiz.duration,
             status = savedQuiz.status,
-            createdByUserId = savedQuiz.createdBy ?: UUID.randomUUID()
+            createdBy = null, // No user mapping for now, setting to empty string
+            createdAt = savedQuiz.createdAt
         )
 
         val questionDTOs = questions.map {
@@ -65,6 +68,7 @@ class AdminService(
         return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
     }
 
+
     fun getQuizDto(quizId: String): QuizDTO? {
         val quiz= quizRepository.findByQuizId(quizId) ?: throw QuizNotFoundException("Quiz Not Found")
         return (quizToQuizDto(quiz))
@@ -79,6 +83,7 @@ class AdminService(
     ): QuizWithQuestionsDto {
         val quiz = quizRepository.findById(id)
             .orElseThrow({ QuizNotFoundException("Quiz not found") })
+
         val updatedQuiz = quiz.copy(
             quizName = quizName ?: quiz.quizName,
             duration = duration ?: quiz.duration
@@ -106,9 +111,19 @@ class AdminService(
             quizName = quiz.quizName,
             duration = quiz.duration,
             status = quiz.status,
-            createdByUserId = quiz.createdBy ?: ""
+            createdBy = quiz.createdBy?.let {
+                UserDTO(
+                    username = it.userName,
+                    email = it.email,
+                    password = it.password,
+                    role = it.role
+                )
+            },
+            createdAt = quiz.createdAt
         )
     }
+
+
 
     fun questionToQuestionsDto(question: Question): QuestionDTO {
         return QuestionDTO(
@@ -174,5 +189,59 @@ class AdminService(
             throw FileFormatException("Error processing file: ${e.localizedMessage}")
         }
     }
+
+    fun getAllQuizzesForAdmin(
+        search: String?,
+        minDuration: Int?,
+        status: QuizStatus?,
+        createdAfter: LocalDateTime?
+    ): List<QuizDTO> {
+        // Fetch all quizzes
+        val quizzes = quizRepository.findAll()
+
+        // Apply filters
+        return quizzes.filter { quiz ->
+            (search == null || quiz.quizName.contains(search, ignoreCase = true)) &&
+                    (minDuration == null || quiz.duration >= minDuration) &&
+                    (status == null || quiz.status == status) &&
+                    (createdAfter == null || quiz.createdAt?.isAfter(createdAfter) == true)
+        }.map { quiz ->
+            QuizDTO(
+                quizId = quiz.quizId,
+                quizName = quiz.quizName,
+                duration = quiz.duration,
+                status = quiz.status,
+                createdBy = quiz.createdBy?.let { user ->
+                    UserDTO(
+                        username = user.userName,
+                        email = user.email,
+                        password = user.password,
+                        role = user.role
+                    )
+                },
+                createdAt = quiz.createdAt
+            )
+        }
+    }
+
+
+
+    //fun for search
+
+    fun searchQuizzes(keyword: String): List<QuizDTO> {
+        val results = quizRepository.searchByKeyword(keyword)
+        return results.map { quizToQuizDto(it) }
+    }
+
+    //Delete
+    @Transactional
+    fun deleteQuizById(quizId: String) {
+        val quiz = quizRepository.findByQuizId(quizId)
+            ?: throw QuizNotFoundException("Quiz not found with ID: $quizId")  // If quiz not found, throw exception
+
+        questionRepository.deleteAllByQuizQuizId(quizId)
+        quizRepository.delete(quiz)
+    }
+
 
 }

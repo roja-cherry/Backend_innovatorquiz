@@ -2,15 +2,11 @@ package com.iq.quiz.controller
 
 import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
-import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.service.AdminService
-import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/admin/quiz")
@@ -47,6 +43,18 @@ class AdminController(
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 
+    @GetMapping("/quizzes/search")
+    fun searchQuizzes(@RequestParam keyword: String): ResponseEntity<List<QuizDTO>> {
+        val results = adminService.searchQuizzes(keyword)
+        return ResponseEntity.ok(results)
+    }
+
+    @DeleteMapping("/quizzes/{id}")
+    fun deleteQuiz(@PathVariable id: String): ResponseEntity<String> {
+        adminService.deleteQuizById(id)  // Calls the service method to delete the quiz
+        return ResponseEntity.ok("Quiz deleted successfully")  // Returns a success message
+    }
+
+
 
 }
-
