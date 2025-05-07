@@ -183,6 +183,7 @@ class AdminService(
                         option4 = optionD,
                         correctAnswer = correctAnswer
                     )
+                    println(question)
                     questions.add(question)
                 }
                 workbook.close()
@@ -191,7 +192,8 @@ class AdminService(
         } catch (e: FileFormatException) {
             throw e
         } catch (e: Exception) {
-            throw FileFormatException("Error processing file: ${e.localizedMessage}")
+            println(e.message)
+            throw FileFormatException("Error processing file: File content not supported")
         }
     }
 
