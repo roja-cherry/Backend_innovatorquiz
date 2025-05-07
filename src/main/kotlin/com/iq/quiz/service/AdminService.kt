@@ -27,6 +27,7 @@ class AdminService(
     private val questionRepository: QuestionRepository
 ) {
 
+    @Transactional
     fun processQuizFile(file: MultipartFile, quizName: String, duration: Int): QuizWithQuestionsDto {
         if (file.isEmpty) {
             throw FileFormatException("Uploaded file is empty.")
