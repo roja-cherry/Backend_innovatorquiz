@@ -46,7 +46,6 @@ class AdminService(
 
         val questions = extractQuestionsFromExcel(file, savedQuiz)
         questionRepository.saveAll(questions)
-
         val quizDto = QuizDTO(
             quizId = savedQuiz.quizId,
             quizName = savedQuiz.quizName,
