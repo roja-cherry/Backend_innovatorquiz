@@ -7,7 +7,6 @@ import com.iq.quiz.Dto.UserDTO
 import com.iq.quiz.Entity.Question
 import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.QuizStatus
-import com.iq.quiz.Entity.User
 import com.iq.quiz.Repository.QuestionRepository
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.exception.FileFormatException
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
-import java.util.*
 
 @Service
 class AdminService(
@@ -39,7 +37,7 @@ class AdminService(
 
         val quiz = Quiz(
             quizName = quizName,
-            duration = duration,
+            timer = duration,
             status = QuizStatus.CREATED,
             createdBy = null,
             createdAt = LocalDateTime.now(),
@@ -74,7 +72,7 @@ class AdminService(
 
         val updatedQuiz = quiz.copy(
             quizName = quizName ?: quiz.quizName,
-            duration = duration ?: quiz.duration
+            timer = duration ?: quiz.timer
         )
 
         if(file != null) {
@@ -97,7 +95,7 @@ class AdminService(
         return QuizDTO(
             quizId = quiz.quizId,
             quizName = quiz.quizName,
-            duration = quiz.duration,
+            timer = quiz.timer,
             status = quiz.status,
             createdBy = quiz.createdBy?.let {
                 UserDTO(
@@ -207,7 +205,7 @@ class AdminService(
             QuizDTO(
                 quizId = quiz.quizId,
                 quizName = quiz.quizName,
-                duration = quiz.duration,
+                timer = quiz.timer,
                 status = quiz.status,
                 isActive = quiz.isActive,
                 createdBy = quiz.createdBy?.let { user ->

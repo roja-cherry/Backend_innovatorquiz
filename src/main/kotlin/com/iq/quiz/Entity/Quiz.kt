@@ -1,9 +1,7 @@
 package com.iq.quiz.Entity
 
 import jakarta.persistence.*
-import java.security.Timestamp
 import java.time.LocalDateTime
-import java.util.*
 
 @Entity
 data class Quiz(
@@ -13,7 +11,7 @@ data class Quiz(
     val quizId : String?=null,
 
     val quizName : String,
-    val duration : Int,
+    val timer : Int,
 
     @Enumerated(EnumType.STRING)
     var status: QuizStatus,

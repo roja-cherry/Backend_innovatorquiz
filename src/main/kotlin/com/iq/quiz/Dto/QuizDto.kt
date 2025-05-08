@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 data class QuizDTO(
     val quizId: String?,
     val quizName: String,
-    val duration: Int,
+    val timer: Int,
     val status: QuizStatus = QuizStatus.CREATED,
     val createdBy: UserDTO?= null,
     val createdAt: LocalDateTime? = null,
