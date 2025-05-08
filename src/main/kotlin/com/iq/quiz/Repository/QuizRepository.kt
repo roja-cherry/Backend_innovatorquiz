@@ -14,6 +14,7 @@ interface QuizRepository : JpaRepository<Quiz, String>{
 
     fun deleteByQuizId(quizId: String)
 
+    fun existsByQuizName(quizName: String): Boolean
 
 
 }

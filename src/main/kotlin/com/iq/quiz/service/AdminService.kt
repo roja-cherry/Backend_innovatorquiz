@@ -33,6 +33,10 @@ class AdminService(
             throw FileFormatException("Uploaded file is empty.")
         }
 
+        if (quizRepository.existsByQuizName(quizName)) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "A quiz with the name '$quizName' already exists.")
+        }
+
         val quiz = Quiz(
             quizName = quizName,
             duration = duration,
@@ -40,34 +44,14 @@ class AdminService(
             createdBy = null,
             createdAt = LocalDateTime.now(),
             isActive = false
-
         )
-        val savedQuiz = quizRepository.save(quiz)
 
+        val savedQuiz = quizRepository.save(quiz)
         val questions = extractQuestionsFromExcel(file, savedQuiz)
         questionRepository.saveAll(questions)
-        val quizDto = QuizDTO(
-            quizId = savedQuiz.quizId,
-            quizName = savedQuiz.quizName,
-            duration = savedQuiz.duration,
-            status = savedQuiz.status,
-            createdBy = null, // No user mapping for now, setting to empty string
-            createdAt = savedQuiz.createdAt,
-            isActive = savedQuiz.isActive
 
-        )
-
-        val questionDTOs = questions.map {
-            QuestionDTO(
-                questionId = it.questionId,
-                question = it.question,
-                option1 = it.option1,
-                option2 = it.option2,
-                option3 = it.option3,
-                option4 = it.option4,
-                correctAnswer = it.correctAnswer
-            )
-        }
+        val quizDto = quizToQuizDto(savedQuiz)
+        val questionDTOs = questions.map { questionToQuestionsDto(it) }
 
         return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
     }
