@@ -12,7 +12,9 @@ data class Quiz(
     @GeneratedValue(strategy = GenerationType.UUID)
     val quizId : String?=null,
 
+    @Column(unique = true)
     val quizName : String,
+
     val duration : Int,
 
     @Enumerated(EnumType.STRING)

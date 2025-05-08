@@ -70,14 +70,22 @@ class AdminService(
         id: String
     ): QuizWithQuestionsDto {
         val quiz = quizRepository.findById(id)
-            .orElseThrow({ QuizNotFoundException("Quiz not found") })
+            .orElseThrow { QuizNotFoundException("Quiz not found") }
+
+        // Check for duplicate name if quizName is being changed
+        if (quizName != null && quizName != quiz.quizName) {
+            val duplicateExists = quizRepository.existsByQuizName(quizName)
+            if (duplicateExists) {
+                throw ResponseStatusException(HttpStatus.CONFLICT, "A quiz with the name '$quizName' already exists.")
+            }
+        }
 
         val updatedQuiz = quiz.copy(
             quizName = quizName ?: quiz.quizName,
             duration = duration ?: quiz.duration
         )
 
-        if(file != null) {
+        if (file != null) {
             questionRepository.deleteAllByQuizQuizId(id)
             val questions = extractQuestionsFromExcel(file, updatedQuiz)
             questionRepository.saveAll(questions)
