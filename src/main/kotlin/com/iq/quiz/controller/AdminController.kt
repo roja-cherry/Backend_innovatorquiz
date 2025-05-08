@@ -4,12 +4,10 @@ import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
 import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.service.AdminService
-import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/admin/quiz")
@@ -21,9 +19,9 @@ class AdminController(
     fun createQuiz(
         @RequestParam("file") file: MultipartFile,
         @RequestParam("quizName") quizName: String,
-        @RequestParam("duration") duration: Int
+        @RequestParam("timer") timer: Int
     ): ResponseEntity<QuizWithQuestionsDto> {
-        val response = adminService.processQuizFile(file, quizName, duration)
+        val response = adminService.processQuizFile(file, quizName, timer)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
     }
 
@@ -31,10 +29,10 @@ class AdminController(
     fun editQuiz(
         @RequestParam("file") file: MultipartFile?,
         @RequestParam("quizName") quizName: String?,
-        @RequestParam("duration") duration: Int?,
+        @RequestParam("timer") timer: Int?,
         @PathVariable id: String
     ) : ResponseEntity<QuizWithQuestionsDto> {
-        val response = adminService.editQuiz(file, quizName, duration, id)
+        val response = adminService.editQuiz(file, quizName, timer, id)
         return ResponseEntity.ok(response)
     }
 

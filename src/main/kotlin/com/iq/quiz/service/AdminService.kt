@@ -26,7 +26,7 @@ class AdminService(
 ) {
 
     @Transactional
-    fun processQuizFile(file: MultipartFile, quizName: String, duration: Int): QuizWithQuestionsDto {
+    fun processQuizFile(file: MultipartFile, quizName: String, timer: Int): QuizWithQuestionsDto {
         if (file.isEmpty) {
             throw FileFormatException("Uploaded file is empty.")
         }
@@ -37,7 +37,7 @@ class AdminService(
 
         val quiz = Quiz(
             quizName = quizName,
-            timer = duration,
+            timer = timer,
             status = QuizStatus.CREATED,
             createdBy = null,
             createdAt = LocalDateTime.now(),
@@ -64,7 +64,7 @@ class AdminService(
     fun editQuiz(
         file: MultipartFile?,
         quizName: String?,
-        duration: Int?,
+        timer: Int?,
         id: String
     ): QuizWithQuestionsDto {
         val quiz = quizRepository.findById(id)
@@ -80,7 +80,7 @@ class AdminService(
 
         val updatedQuiz = quiz.copy(
             quizName = quizName ?: quiz.quizName,
-            timer = duration ?: quiz.timer
+            timer = timer ?: quiz.timer
         )
 
         if (file != null) {
