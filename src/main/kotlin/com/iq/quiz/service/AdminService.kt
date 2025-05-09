@@ -1,9 +1,6 @@
 package com.iq.quiz.service
 
-import com.iq.quiz.Dto.QuestionDTO
-import com.iq.quiz.Dto.QuizDTO
-import com.iq.quiz.Dto.QuizWithQuestionsDto
-import com.iq.quiz.Dto.UserDTO
+import com.iq.quiz.Dto.*
 import com.iq.quiz.Entity.Question
 import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.QuizStatus
@@ -281,7 +278,9 @@ class AdminService(
             status = quiz.status,
             createdBy = null, // Optional: map createdBy -> UserDTO if needed
             createdAt = quiz.createdAt,
-            isActive = quiz.isActive
+            isActive = quiz.isActive,
+            quizStartDateTime = quiz.quizStartDateTime,
+            quizEndDateTime = quiz.quizEndDateTime
         )
 
         val questionDtos = questions.map { question ->
