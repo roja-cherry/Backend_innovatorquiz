@@ -249,5 +249,38 @@ class AdminService(
         quizRepository.delete(quiz)
     }
 
+    fun getQuizWithQuestions(quizId: String): QuizWithQuestionsDto {
+        val quiz = quizRepository.findByQuizId(quizId)
+            ?: throw RuntimeException("Quiz not found with id: $quizId")
+
+        val questions = questionRepository.findByQuizQuizId(quizId)
+
+        val quizDto = QuizDTO(
+            quizId = quiz.quizId,
+            quizName = quiz.quizName,
+            timer = quiz.timer,
+            status = quiz.status,
+            createdBy = null, // Optional: map createdBy -> UserDTO if needed
+            createdAt = quiz.createdAt,
+            isActive = quiz.isActive
+        )
+
+        val questionDtos = questions.map { question ->
+            QuestionDTO(
+                questionId = question.questionId,
+                question = question.question,
+                option1 = question.option1,
+                option2 = question.option2,
+                option3 = question.option3,
+                option4 = question.option4,
+                correctAnswer = question.correctAnswer
+            )
+        }
+
+        return QuizWithQuestionsDto(
+            quiz = quizDto,
+            questions = questionDtos
+        )
+    }
 
 }

@@ -67,6 +67,10 @@ class AdminController(
     }
 
 
+    @GetMapping("/quiz-with-questions/{quizId}")
+    fun getQuizWithQuestions(@PathVariable quizId: String): QuizWithQuestionsDto {
+        return adminService.getQuizWithQuestions(quizId)
+    }
 
 
 
