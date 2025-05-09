@@ -10,6 +10,7 @@ import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.Repository.QuestionRepository
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.exception.FileFormatException
+import com.iq.quiz.exception.QuizException
 import com.iq.quiz.exception.QuizNotFoundException
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.http.HttpStatus
@@ -114,7 +115,9 @@ class AdminService(
                 )
             },
             createdAt = quiz.createdAt,
-            isActive = quiz.isActive
+            isActive = quiz.isActive,
+            quizStartDateTime = quiz.quizStartDateTime,
+            quizEndDateTime = quiz.quizEndDateTime
         )
     }
 
@@ -224,7 +227,9 @@ class AdminService(
                         role = user.role
                     )
                 },
-                createdAt = quiz.createdAt
+                createdAt = quiz.createdAt,
+                quizStartDateTime = quiz.quizStartDateTime,
+                quizEndDateTime = quiz.quizEndDateTime
             )
         }
     }
@@ -249,6 +254,20 @@ class AdminService(
         quizRepository.delete(quiz)
     }
 
+    @Transactional
+    fun publishQuiz(publishDto: PublishQuizRequest): QuizDTO {
+        val quiz = quizRepository.findById(publishDto.quizId)
+            .orElseThrow { QuizNotFoundException("Quiz not found with id ${publishDto.quizId}") }
+
+        if(quiz.status == QuizStatus.COMPLETED)
+            throw QuizException("Can't publish quiz, quiz completed", HttpStatus.BAD_REQUEST)
+
+
+        val publishedQuiz = quiz.copy(
+            status = QuizStatus.PUBLISHED,
+            quizStartDateTime = publishDto.quizStartDateTime,
+            quizEndDateTime = publishDto.quizEndDateTime
+        )
     fun getQuizWithQuestions(quizId: String): QuizWithQuestionsDto {
         val quiz = quizRepository.findByQuizId(quizId)
             ?: throw RuntimeException("Quiz not found with id: $quizId")
@@ -283,4 +302,15 @@ class AdminService(
         )
     }
 
+        val savedQuiz = quizRepository.save(publishedQuiz)
+        return quizToQuizDto(savedQuiz)
+    }
+
+    fun updateIsActive(id: String, active: Boolean):QuizDTO {
+        val quiz=quizRepository.findByQuizId(id)?:throw QuizNotFoundException("Quiz not found with ID: $id")
+        quiz.isActive=active;
+        quizRepository.save(quiz)
+        val updatedQuiz=quizToQuizDto(quiz)
+        return updatedQuiz
+    }
 }

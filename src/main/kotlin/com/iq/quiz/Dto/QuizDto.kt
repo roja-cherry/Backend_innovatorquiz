@@ -12,6 +12,8 @@ data class QuizDTO(
     val status: QuizStatus = QuizStatus.CREATED,
     val createdBy: UserDTO?= null,
     val createdAt: LocalDateTime? = null,
-    val isActive:Boolean
+    val isActive:Boolean,
+    val quizStartDateTime: LocalDateTime?,
+    val quizEndDateTime: LocalDateTime?
 )
 

@@ -30,4 +30,14 @@ class GlobalExceptionHandler {
             return ResponseEntity(error, HttpStatus.NOT_FOUND)
     }
 
+    @ExceptionHandler(QuizException::class)
+    fun handleQuizException(ex: QuizException): ResponseEntity<ErrorResponse> {
+        val error = ErrorResponse(
+            timestamp = LocalDateTime.now(),
+            status = ex.status.value(),
+            message = ex.message
+        )
+        return ResponseEntity.status(ex.status).body(error)
+    }
+
 }

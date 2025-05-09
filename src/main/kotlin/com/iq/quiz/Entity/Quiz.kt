@@ -24,10 +24,9 @@ data class Quiz(
     @JoinColumn(name = "created_by", nullable = true)
     val createdBy: User? = null,
 
-
     var createdAt: LocalDateTime?=null,
-
-    var isActive:Boolean
-
+    var isActive: Boolean,
+    var quizStartDateTime: LocalDateTime?=null,
+    var quizEndDateTime: LocalDateTime?=null
 )
 
