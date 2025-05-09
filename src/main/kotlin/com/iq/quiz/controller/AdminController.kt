@@ -2,6 +2,7 @@ package com.iq.quiz.controller
 
 import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
+import com.iq.quiz.Dto.UpdateIsActive
 import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.service.AdminService
 import org.springframework.http.HttpStatus
@@ -64,6 +65,15 @@ class AdminController(
         @RequestParam(required = false) createdWithin: String? // "1m", "3m", "6m", "before6m"
     ): List<QuizDTO> {
         return adminService.getAllQuizzesForAdmin(isActive, status, createdWithin)
+    }
+
+    @PatchMapping("/{id}")
+    fun updateIsActive(
+        @PathVariable id:String,
+        @RequestBody updateIsActive: UpdateIsActive
+    ):ResponseEntity<QuizDTO>{
+        val response=adminService.updateIsActive(id,updateIsActive.isActive)
+        return ResponseEntity.ok(response)
     }
 
 
