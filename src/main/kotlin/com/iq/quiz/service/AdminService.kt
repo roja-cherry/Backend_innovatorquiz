@@ -1,15 +1,13 @@
 package com.iq.quiz.service
 
-import com.iq.quiz.Dto.QuestionDTO
-import com.iq.quiz.Dto.QuizDTO
-import com.iq.quiz.Dto.QuizWithQuestionsDto
-import com.iq.quiz.Dto.UserDTO
+import com.iq.quiz.Dto.*
 import com.iq.quiz.Entity.Question
 import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.Repository.QuestionRepository
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.exception.FileFormatException
+import com.iq.quiz.exception.QuizException
 import com.iq.quiz.exception.QuizNotFoundException
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.springframework.http.HttpStatus
@@ -53,7 +51,6 @@ class AdminService(
 
         return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
     }
-
 
     fun getQuizDto(quizId: String): QuizDTO? {
         val quiz= quizRepository.findByQuizId(quizId) ?: throw QuizNotFoundException("Quiz Not Found")
@@ -114,11 +111,11 @@ class AdminService(
                 )
             },
             createdAt = quiz.createdAt,
-            isActive = quiz.isActive
+            isActive = quiz.isActive,
+            quizStartDateTime = quiz.quizStartDateTime,
+            quizEndDateTime = quiz.quizEndDateTime
         )
     }
-
-
 
     fun questionToQuestionsDto(question: Question): QuestionDTO {
         return QuestionDTO(
@@ -224,21 +221,17 @@ class AdminService(
                         role = user.role
                     )
                 },
-                createdAt = quiz.createdAt
+                createdAt = quiz.createdAt,
+                quizStartDateTime = quiz.quizStartDateTime,
+                quizEndDateTime = quiz.quizEndDateTime
             )
         }
     }
-
-
-
-    //fun for search
 
     fun searchQuizzes(keyword: String): List<QuizDTO> {
         val results = quizRepository.searchByKeyword(keyword)
         return results.map { quizToQuizDto(it) }
     }
-
-    //Delete
 
     @Transactional
     fun deleteQuizById(quizId: String) {
@@ -249,5 +242,21 @@ class AdminService(
         quizRepository.delete(quiz)
     }
 
+    @Transactional
+    fun publishQuiz(publishDto: PublishQuizRequest): QuizDTO {
+        val quiz = quizRepository.findById(publishDto.quizId)
+            .orElseThrow { QuizNotFoundException("Quiz not found with id ${publishDto.quizId}") }
 
+        if(quiz.status == QuizStatus.COMPLETED)
+            throw QuizException("Can't publish quiz, quiz completed", HttpStatus.BAD_REQUEST)
+
+        val publishedQuiz = quiz.copy(
+            status = QuizStatus.PUBLISHED,
+            quizStartDateTime = publishDto.quizStartDateTime,
+            quizEndDateTime = publishDto.quizEndDateTime
+        )
+
+        val savedQuiz = quizRepository.save(publishedQuiz)
+        return quizToQuizDto(savedQuiz)
+    }
 }

@@ -1,9 +1,11 @@
 package com.iq.quiz.controller
 
+import com.iq.quiz.Dto.PublishQuizRequest
 import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
 import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.service.AdminService
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -66,8 +68,11 @@ class AdminController(
         return adminService.getAllQuizzesForAdmin(isActive, status, createdWithin)
     }
 
-
-
+    @PatchMapping("/publish")
+    fun publishQuiz(@RequestBody @Valid publishDto: PublishQuizRequest): ResponseEntity<QuizDTO> {
+        val response = adminService.publishQuiz(publishDto)
+        return ResponseEntity.ok(response)
+    }
 
 
 }
