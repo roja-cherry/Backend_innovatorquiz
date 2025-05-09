@@ -249,13 +249,6 @@ class AdminService(
 
         if(quiz.status == QuizStatus.COMPLETED)
             throw QuizException("Can't publish quiz, quiz completed", HttpStatus.BAD_REQUEST)
-    fun updateIsActive(id: String, active: Boolean):QuizDTO {
-        val quiz=quizRepository.findByQuizId(id)?:throw QuizNotFoundException("Quiz not found with ID: $id")
-        quiz.isActive=active;
-        quizRepository.save(quiz)
-        val updatedQuiz=quizToQuizDto(quiz)
-        return updatedQuiz
-    }
 
 
         val publishedQuiz = quiz.copy(
@@ -266,5 +259,13 @@ class AdminService(
 
         val savedQuiz = quizRepository.save(publishedQuiz)
         return quizToQuizDto(savedQuiz)
+    }
+
+    fun updateIsActive(id: String, active: Boolean):QuizDTO {
+        val quiz=quizRepository.findByQuizId(id)?:throw QuizNotFoundException("Quiz not found with ID: $id")
+        quiz.isActive=active;
+        quizRepository.save(quiz)
+        val updatedQuiz=quizToQuizDto(quiz)
+        return updatedQuiz
     }
 }
