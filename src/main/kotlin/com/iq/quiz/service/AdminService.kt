@@ -52,6 +52,7 @@ class AdminService(
         return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
     }
 
+
     fun getQuizDto(quizId: String): QuizDTO? {
         val quiz= quizRepository.findByQuizId(quizId) ?: throw QuizNotFoundException("Quiz Not Found")
         return (quizToQuizDto(quiz))
@@ -116,6 +117,8 @@ class AdminService(
             quizEndDateTime = quiz.quizEndDateTime
         )
     }
+
+
 
     fun questionToQuestionsDto(question: Question): QuestionDTO {
         return QuestionDTO(
@@ -228,10 +231,16 @@ class AdminService(
         }
     }
 
+
+
+    //fun for search
+
     fun searchQuizzes(keyword: String): List<QuizDTO> {
         val results = quizRepository.searchByKeyword(keyword)
         return results.map { quizToQuizDto(it) }
     }
+
+    //Delete
 
     @Transactional
     fun deleteQuizById(quizId: String) {
@@ -256,6 +265,41 @@ class AdminService(
             quizStartDateTime = publishDto.quizStartDateTime,
             quizEndDateTime = publishDto.quizEndDateTime
         )
+    fun getQuizWithQuestions(quizId: String): QuizWithQuestionsDto {
+        val quiz = quizRepository.findByQuizId(quizId)
+            ?: throw RuntimeException("Quiz not found with id: $quizId")
+
+        val questions = questionRepository.findByQuizQuizId(quizId)
+
+        val quizDto = QuizDTO(
+            quizId = quiz.quizId,
+            quizName = quiz.quizName,
+            timer = quiz.timer,
+            status = quiz.status,
+            createdBy = null, // Optional: map createdBy -> UserDTO if needed
+            createdAt = quiz.createdAt,
+            isActive = quiz.isActive,
+            quizStartDateTime = quiz.quizStartDateTime,
+            quizEndDateTime = quiz.quizEndDateTime
+        )
+
+        val questionDtos = questions.map { question ->
+            QuestionDTO(
+                questionId = question.questionId,
+                question = question.question,
+                option1 = question.option1,
+                option2 = question.option2,
+                option3 = question.option3,
+                option4 = question.option4,
+                correctAnswer = question.correctAnswer
+            )
+        }
+
+        return QuizWithQuestionsDto(
+            quiz = quizDto,
+            questions = questionDtos
+        )
+    }
 
         val savedQuiz = quizRepository.save(publishedQuiz)
         return quizToQuizDto(savedQuiz)

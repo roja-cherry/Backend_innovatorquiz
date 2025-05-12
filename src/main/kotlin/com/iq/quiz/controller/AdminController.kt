@@ -78,6 +78,10 @@ class AdminController(
         return ResponseEntity.ok(response)
     }
 
+    @GetMapping("/quiz-with-questions/{quizId}")
+    fun getQuizWithQuestions(@PathVariable quizId: String): QuizWithQuestionsDto {
+        return adminService.getQuizWithQuestions(quizId)
+    }
 
 
     @PatchMapping("/publish")
