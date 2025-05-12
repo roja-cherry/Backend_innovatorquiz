@@ -26,7 +26,6 @@ data class Quiz(
 
     var createdAt: LocalDateTime?=null,
     var isActive: Boolean,
-    var quizStartDateTime: LocalDateTime?=null,
-    var quizEndDateTime: LocalDateTime?=null
+
 )
 
