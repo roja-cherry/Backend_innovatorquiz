@@ -1,9 +1,24 @@
 package com.iq.quiz.controller
 
+import com.iq.quiz.Dto.schedule.ScheduleDto
+import com.iq.quiz.Entity.Schedule
+import com.iq.quiz.service.ScheduleService
+import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/schedule")
-class ScheduleController {
+class ScheduleController(
+    private val scheduleService: ScheduleService
+) {
+
+    @PostMapping
+    fun createNewSchedule(@RequestBody @Valid dto: ScheduleDto): ResponseEntity<Schedule> {
+        val response = scheduleService.createNewQuiz(dto)
+        return ResponseEntity.status(201).body(response)
+    }
 }
