@@ -3,11 +3,11 @@ package com.iq.quiz.service
 import com.iq.quiz.Entity.Schedule
 import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.Dto.schedule.ScheduleEditCreateRequest
-import com.iq.quiz.Entity.Schedule
-import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.Repository.ScheduleRepository
+import com.iq.quiz.exception.QuizNotFoundException
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 @Service
 class ScheduleService(
