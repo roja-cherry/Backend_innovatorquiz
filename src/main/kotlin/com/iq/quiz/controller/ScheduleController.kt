@@ -6,6 +6,7 @@ import com.iq.quiz.service.ScheduleService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -20,5 +21,10 @@ class ScheduleController(
     fun createNewSchedule(@RequestBody @Valid dto: ScheduleEditCreateRequest): ResponseEntity<Schedule> {
         val response = scheduleService.createNewQuiz(dto)
         return ResponseEntity.status(201).body(response)
+    }
+
+    @PutMapping("/{id}")
+    fun editSchedule(@RequestBody @Valid dto: ScheduleEditCreateRequest): ResponseEntity<Schedule>? {
+        return null
     }
 }
