@@ -5,5 +5,4 @@ enum class ScheduleStatus {
     LIVE,
     COMPLETED,
     CANCELLED,
-    RE_SCHEDULED
 }
