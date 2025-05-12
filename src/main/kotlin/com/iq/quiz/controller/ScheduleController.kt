@@ -25,7 +25,7 @@ class ScheduleController(
         return scheduleService.getScheduleById(id)
     }
 
-    @GetMapping("/All_Schedule")
+    @GetMapping
     fun getAllSchedules(): List<ScheduleDto> {
         return scheduleService.getAllSchedules()
     }
