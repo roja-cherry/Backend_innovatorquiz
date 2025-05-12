@@ -1,6 +1,6 @@
 package com.iq.quiz.controller
 
-import com.iq.quiz.Dto.schedule.ScheduleDto
+import com.iq.quiz.Dto.schedule.ScheduleEditCreateRequest
 import com.iq.quiz.Entity.Schedule
 import com.iq.quiz.service.ScheduleService
 import jakarta.validation.Valid
@@ -17,7 +17,7 @@ class ScheduleController(
 ) {
 
     @PostMapping
-    fun createNewSchedule(@RequestBody @Valid dto: ScheduleDto): ResponseEntity<Schedule> {
+    fun createNewSchedule(@RequestBody @Valid dto: ScheduleEditCreateRequest): ResponseEntity<Schedule> {
         val response = scheduleService.createNewQuiz(dto)
         return ResponseEntity.status(201).body(response)
     }

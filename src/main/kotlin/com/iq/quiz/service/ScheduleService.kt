@@ -1,6 +1,6 @@
 package com.iq.quiz.service
 
-import com.iq.quiz.Dto.schedule.ScheduleDto
+import com.iq.quiz.Dto.schedule.ScheduleEditCreateRequest
 import com.iq.quiz.Entity.Schedule
 import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.Repository.QuizRepository
@@ -15,7 +15,7 @@ class ScheduleService(
     private val quizRepository: QuizRepository
 ) {
 
-    fun createNewQuiz(dto: ScheduleDto): Schedule {
+    fun createNewQuiz(dto: ScheduleEditCreateRequest): Schedule {
         val quiz = quizRepository.findByQuizId(dto.quizId)
             ?: throw QuizNotFoundException("Quiz not found with id ${dto.quizId}")
 

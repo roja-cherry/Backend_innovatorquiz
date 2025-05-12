@@ -3,7 +3,7 @@ package com.iq.quiz.Dto.schedule
 import jakarta.validation.constraints.Future
 import java.time.LocalDateTime
 
-data class ScheduleDto(
+data class ScheduleEditCreateRequest(
     val id: String ?= null,
 
     @field:Future
