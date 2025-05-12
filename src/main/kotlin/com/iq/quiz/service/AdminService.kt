@@ -36,10 +36,7 @@ class AdminService(
         val quiz = Quiz(
             quizName = quizName,
             timer = timer,
-            status = QuizStatus.CREATED,
-            createdBy = null,
             createdAt = LocalDateTime.now(),
-            isActive = false
         )
 
         val savedQuiz = quizRepository.save(quiz)
@@ -54,7 +51,7 @@ class AdminService(
 
 
     fun getQuizDto(quizId: String): QuizDTO? {
-        val quiz= quizRepository.findByQuizId(quizId) ?: throw QuizNotFoundException("Quiz Not Found")
+        val quiz = quizRepository.findByQuizId(quizId) ?: throw QuizNotFoundException("Quiz Not Found")
         return (quizToQuizDto(quiz))
     }
 
@@ -102,22 +99,9 @@ class AdminService(
             quizId = quiz.quizId,
             quizName = quiz.quizName,
             timer = quiz.timer,
-            status = quiz.status,
-            createdBy = quiz.createdBy?.let {
-                UserDTO(
-                    username = it.userName,
-                    email = it.email,
-                    password = it.password,
-                    role = it.role
-                )
-            },
             createdAt = quiz.createdAt,
-            isActive = quiz.isActive,
-            quizStartDateTime = quiz.quizStartDateTime,
-            quizEndDateTime = quiz.quizEndDateTime
         )
     }
-
 
 
     fun questionToQuestionsDto(question: Question): QuestionDTO {
@@ -132,7 +116,7 @@ class AdminService(
         )
     }
 
-    fun extractQuestionsFromExcel(file: MultipartFile, quiz: Quiz) : List<Question> {
+    fun extractQuestionsFromExcel(file: MultipartFile, quiz: Quiz): List<Question> {
         val questions = mutableListOf<Question>()
 
         try {
@@ -159,8 +143,10 @@ class AdminService(
                     val correctAnswer = when (correctAnswerCell.cellType) {
                         org.apache.poi.ss.usermodel.CellType.STRING ->
                             correctAnswerCell.stringCellValue.trim()
+
                         org.apache.poi.ss.usermodel.CellType.NUMERIC ->
                             correctAnswerCell.numericCellValue.toInt().toString()
+
                         else -> throw FileFormatException("Invalid correct answer format in row ${index + 1}")
                     }
 
@@ -203,34 +189,19 @@ class AdminService(
         }
 
         return quizRepository.findAll().filter { quiz ->
-            quiz.isActive == isActive &&
-                    (status == null || quiz.status == status) &&
-                    (createdWithin == null || when (createdWithin) {
-                        "before6m" -> quiz.createdAt?.isBefore(cutoffDate) == true
-                        else -> quiz.createdAt?.isAfter(cutoffDate) == true
-                    })
+            (createdWithin == null || when (createdWithin) {
+                "before6m" -> quiz.createdAt?.isBefore(cutoffDate) == true
+                else -> quiz.createdAt?.isAfter(cutoffDate) == true
+            })
         }.map { quiz ->
             QuizDTO(
                 quizId = quiz.quizId,
                 quizName = quiz.quizName,
                 timer = quiz.timer,
-                status = quiz.status,
-                isActive = quiz.isActive,
-                createdBy = quiz.createdBy?.let { user ->
-                    UserDTO(
-                        username = user.userName,
-                        email = user.email,
-                        password = user.password,
-                        role = user.role
-                    )
-                },
                 createdAt = quiz.createdAt,
-                quizStartDateTime = quiz.quizStartDateTime,
-                quizEndDateTime = quiz.quizEndDateTime
             )
         }
     }
-
 
 
     //fun for search
@@ -251,30 +222,10 @@ class AdminService(
         quizRepository.delete(quiz)
     }
 
-    @Transactional
-    fun publishQuiz(publishDto: PublishQuizRequest): QuizDTO {
-        val quiz = quizRepository.findById(publishDto.quizId)
-            .orElseThrow { QuizNotFoundException("Quiz not found with id ${publishDto.quizId}") }
-
-        if(quiz.status == QuizStatus.COMPLETED)
-            throw QuizException("Can't publish quiz, quiz completed", HttpStatus.BAD_REQUEST)
-
-
-        val publishedQuiz = quiz.copy(
-            status = QuizStatus.PUBLISHED,
-            quizStartDateTime = publishDto.quizStartDateTime,
-            quizEndDateTime = publishDto.quizEndDateTime
-        )
-
-        val savedQuiz = quizRepository.save(publishedQuiz)
-        return quizToQuizDto(savedQuiz)
-    }
-
-    fun updateIsActive(id: String, active: Boolean):QuizDTO {
-        val quiz=quizRepository.findByQuizId(id)?:throw QuizNotFoundException("Quiz not found with ID: $id")
-        quiz.isActive=active;
+    fun updateIsActive(id: String, active: Boolean): QuizDTO {
+        val quiz = quizRepository.findByQuizId(id) ?: throw QuizNotFoundException("Quiz not found with ID: $id")
         quizRepository.save(quiz)
-        val updatedQuiz=quizToQuizDto(quiz)
+        val updatedQuiz = quizToQuizDto(quiz)
         return updatedQuiz
     }
 
@@ -288,12 +239,7 @@ class AdminService(
             quizId = quiz.quizId,
             quizName = quiz.quizName,
             timer = quiz.timer,
-            status = quiz.status,
-            createdBy = null, // Optional: map createdBy -> UserDTO if needed
             createdAt = quiz.createdAt,
-            isActive = quiz.isActive,
-            quizStartDateTime = quiz.quizStartDateTime,
-            quizEndDateTime = quiz.quizEndDateTime
         )
 
         val questionDtos = questions.map { question ->

@@ -10,22 +10,12 @@ data class Quiz(
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val quizId : String?=null,
+    val quizId : String ?= null,
 
     @Column(unique = true)
     val quizName : String,
 
     val timer : Int,
-
-    @Enumerated(EnumType.STRING)
-    var status: QuizStatus,
-
-    @ManyToOne
-    @JoinColumn(name = "created_by", nullable = true)
-    val createdBy: User? = null,
-
-    var createdAt: LocalDateTime?=null,
-    var isActive: Boolean,
-
+    var createdAt: LocalDateTime ?= null,
 )
 

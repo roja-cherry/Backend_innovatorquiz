@@ -82,13 +82,4 @@ class AdminController(
     fun getQuizWithQuestions(@PathVariable quizId: String): QuizWithQuestionsDto {
         return adminService.getQuizWithQuestions(quizId)
     }
-
-
-    @PatchMapping("/publish")
-    fun publishQuiz(@RequestBody @Valid publishDto: PublishQuizRequest): ResponseEntity<QuizDTO> {
-        val response = adminService.publishQuiz(publishDto)
-        return ResponseEntity.ok(response)
-    }
-
-
 }
