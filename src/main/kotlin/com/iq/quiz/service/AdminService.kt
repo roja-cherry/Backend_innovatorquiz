@@ -265,6 +265,19 @@ class AdminService(
             quizStartDateTime = publishDto.quizStartDateTime,
             quizEndDateTime = publishDto.quizEndDateTime
         )
+
+        val savedQuiz = quizRepository.save(publishedQuiz)
+        return quizToQuizDto(savedQuiz)
+    }
+
+    fun updateIsActive(id: String, active: Boolean):QuizDTO {
+        val quiz=quizRepository.findByQuizId(id)?:throw QuizNotFoundException("Quiz not found with ID: $id")
+        quiz.isActive=active;
+        quizRepository.save(quiz)
+        val updatedQuiz=quizToQuizDto(quiz)
+        return updatedQuiz
+    }
+
     fun getQuizWithQuestions(quizId: String): QuizWithQuestionsDto {
         val quiz = quizRepository.findByQuizId(quizId)
             ?: throw RuntimeException("Quiz not found with id: $quizId")
@@ -299,17 +312,5 @@ class AdminService(
             quiz = quizDto,
             questions = questionDtos
         )
-    }
-
-        val savedQuiz = quizRepository.save(publishedQuiz)
-        return quizToQuizDto(savedQuiz)
-    }
-
-    fun updateIsActive(id: String, active: Boolean):QuizDTO {
-        val quiz=quizRepository.findByQuizId(id)?:throw QuizNotFoundException("Quiz not found with ID: $id")
-        quiz.isActive=active;
-        quizRepository.save(quiz)
-        val updatedQuiz=quizToQuizDto(quiz)
-        return updatedQuiz
     }
 }
