@@ -20,6 +20,7 @@ data class Schedule(
 
     val updatedAt: LocalDateTime,
 
+    @Enumerated(EnumType.STRING)
     val status: ScheduleStatus,
 
     @ManyToOne
