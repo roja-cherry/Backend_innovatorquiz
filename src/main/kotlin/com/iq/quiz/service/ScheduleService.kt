@@ -2,6 +2,9 @@ package com.iq.quiz.service
 
 import com.iq.quiz.Entity.Schedule
 import com.iq.quiz.Entity.ScheduleStatus
+import com.iq.quiz.Dto.schedule.ScheduleEditCreateRequest
+import com.iq.quiz.Entity.Schedule
+import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.Repository.ScheduleRepository
 import org.springframework.stereotype.Service
@@ -19,4 +22,20 @@ class ScheduleService(
         return scheduleRepository.save(schedule) // Save changes
     }
 
+
+    fun createNewQuiz(dto: ScheduleEditCreateRequest): Schedule {
+        val quiz = quizRepository.findByQuizId(dto.quizId)
+            ?: throw QuizNotFoundException("Quiz not found with id ${dto.quizId}")
+
+        val schedule = Schedule(
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now(),
+            status = ScheduleStatus.SCHEDULED,
+            quiz = quiz,
+            startDateTime = dto.startDateTime,
+            endDateTime = dto.endDateTime
+        )
+
+        return scheduleRepository.save(schedule)
+    }
 }
