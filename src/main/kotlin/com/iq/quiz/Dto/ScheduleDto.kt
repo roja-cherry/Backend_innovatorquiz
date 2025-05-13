@@ -15,6 +15,8 @@ data class ScheduleDto(
     val status: ScheduleStatus,
     val quizTitle: String,
     val quizId: String
-
-
-)
+) {
+    fun getStatusText(): String {
+        return status.getStatusText()
+    }
+}
