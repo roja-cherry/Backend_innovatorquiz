@@ -113,7 +113,7 @@ class ScheduleService(
             request.endDateTime,
             id
         )
-        println("ISSUEEE:\n\n\n$isAnyOtherScheduled")
+
         if(isAnyOtherScheduled) {
             throw ScheduleException("A quiz is already scheduled between this time range", HttpStatus.BAD_REQUEST)
         }
@@ -124,7 +124,6 @@ class ScheduleService(
 
         return scheduleRepository.save(existingSchedule)
     }
-
 
 
     fun getSchedulesByQuizId(quizId: String): List<ScheduleDto>  {

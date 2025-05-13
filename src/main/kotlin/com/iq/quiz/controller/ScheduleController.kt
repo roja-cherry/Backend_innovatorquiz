@@ -3,7 +3,6 @@ package com.iq.quiz.controller
 import com.iq.quiz.Dto.ScheduleDto
 import com.iq.quiz.Dto.schedule.ScheduleEditCreateRequest
 import com.iq.quiz.Entity.Schedule
-import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.service.ScheduleService
 import jakarta.validation.Valid
@@ -47,9 +46,11 @@ class ScheduleController(
         return scheduleService.getScheduleById(id)
     }
 
-    @GetMapping("/all-schedule")
-    fun getAllSchedules(): List<ScheduleDto> {
-        return scheduleService.getAllSchedules()
+    @GetMapping("/all-schedule") //apply filtering condition
+    fun getAllSchedules(
+        @RequestParam status: ScheduleStatus?
+    ): List<ScheduleDto> {
+        return scheduleService.getSchedulesByStatus(status)
     }
 
     @GetMapping("/quiz/{quizId}")
@@ -57,6 +58,8 @@ class ScheduleController(
         val schedules = scheduleService.getSchedulesByQuizId(quizId)
         return ResponseEntity.ok(schedules)
     }
+
+
 
     @GetMapping("/status")
     fun getSchedulesByStatus(@RequestParam(required = false) status: ScheduleStatus?): List<ScheduleDto> {
