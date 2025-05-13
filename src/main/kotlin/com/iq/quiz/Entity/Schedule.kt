@@ -12,11 +12,11 @@ data class Schedule(
 
     @Future
     @Column(unique = true)
-    var startDateTime: LocalDateTime,
+    var startDateTime: LocalDateTime?,
 
     @Future
     @Column(unique = true)
-    var endDateTime: LocalDateTime,
+    var endDateTime: LocalDateTime?,
 
     val createdAt: LocalDateTime,
 
