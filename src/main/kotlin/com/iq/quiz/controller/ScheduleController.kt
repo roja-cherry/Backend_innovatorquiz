@@ -65,7 +65,7 @@ class ScheduleController(
 
 
 
-    @PatchMapping("/{id}/rescedule")
+    @PatchMapping("/{id}/reschedule")
     fun reschedule(
         @PathVariable id:String,
         @RequestBody @Valid request:ScheduleEditCreateRequest

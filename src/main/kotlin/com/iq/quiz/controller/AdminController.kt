@@ -64,9 +64,10 @@ class AdminController(
     fun getAllQuizzesForAdmin(
         @RequestParam(required = false) isActive: Boolean,
         @RequestParam(required = false) status: QuizStatus?,
-        @RequestParam(required = false) createdWithin: String? // "1m", "3m", "6m", "before6m"
+        @RequestParam(required = false) createdWithin: String?, // "1m", "3m", "6m", "before6m"
+        @RequestParam(required = false) isScheduled: Boolean?     = null    // ← new
     ): List<QuizDTO> {
-        return adminService.getAllQuizzesForAdmin(isActive, status, createdWithin)
+        return adminService.getAllQuizzesForAdmin(isActive, status, createdWithin,isScheduled)
     }
 
     @PatchMapping("/{id}")
