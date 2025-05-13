@@ -47,15 +47,18 @@ class ScheduleController(
         return scheduleService.getScheduleById(id)
     }
 
-    @GetMapping("/all-schedule")
-    fun getAllSchedules(): List<ScheduleDto> {
-        return scheduleService.getAllSchedules()
+    @GetMapping("/all-schedule") //apply filtering condition
+    fun getAllSchedules(
+        @RequestParam status: ScheduleStatus?
+    ): List<ScheduleDto> {
+        return scheduleService.getSchedulesByStatus(status)
     }
+
+
     @GetMapping("/status")
     fun getSchedulesByStatus(@RequestParam(required = false) status: ScheduleStatus?): List<ScheduleDto> {
         return scheduleService.getSchedulesByStatus(status)
     }
-
 
 
     @PatchMapping("/{id}/rescedule")

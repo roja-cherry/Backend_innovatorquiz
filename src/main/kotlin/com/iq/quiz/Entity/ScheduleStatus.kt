@@ -5,4 +5,5 @@ enum class ScheduleStatus {
     LIVE,
     COMPLETED,
     CANCELLED,
+    ALL //for filtering only
 }
