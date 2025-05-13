@@ -7,6 +7,8 @@ import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.exception.QuizNotFoundException
+import com.iq.quiz.exception.ScheduleException
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -19,6 +21,11 @@ class ScheduleService(
     fun createNewSchedule(dto: ScheduleEditCreateRequest): Schedule {
         val quiz = quizRepository.findByQuizId(dto.quizId)
             ?: throw QuizNotFoundException("Quiz not found with id ${dto.quizId}")
+
+        val isScheduleExistsBetweenTime = scheduleRepository.existsByTimeRangeOverlap(dto.startDateTime, dto.endDateTime)
+        if(isScheduleExistsBetweenTime) {
+            throw ScheduleException("A quiz is already scheduled between this this", HttpStatus.BAD_REQUEST)
+        }
 
         val schedule = Schedule(
             createdAt = LocalDateTime.now(),
