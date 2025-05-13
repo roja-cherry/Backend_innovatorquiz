@@ -29,4 +29,11 @@ class ScheduleController(
     fun getAllSchedules(): List<ScheduleDto> {
         return scheduleService.getAllSchedules()
     }
+
+    @GetMapping("/quiz/{id}")
+    fun getSchedulesByQuizId(@PathVariable quizId: String): ResponseEntity<List<Unit>> {
+        val schedules = scheduleService.getSchedulesByQuizId(quizId)
+        return ResponseEntity.ok(schedules)
+    }
+
 }

@@ -7,6 +7,7 @@ import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.exception.QuizNotFoundException
+import com.iq.quiz.mapper.scheduleToDto
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -57,5 +58,10 @@ class ScheduleService(
                 status = schedule.status
             )
         }
+    }
+
+    fun getSchedulesByQuizId(quizId: String): List<Unit> {
+        val schedules = scheduleRepository.findByQuizQuizId(quizId)
+        return schedules.map { schedule -> scheduleToDto(schedule) }
     }
 }

@@ -9,4 +9,7 @@ import org.springframework.stereotype.Repository
 interface ScheduleRepository: JpaRepository<Schedule, String> {
     fun findAllByQuiz(quiz: Quiz): List<Schedule>
 
+    fun findByQuizQuizId(quizId: String): List<Schedule>
+
+
 }
