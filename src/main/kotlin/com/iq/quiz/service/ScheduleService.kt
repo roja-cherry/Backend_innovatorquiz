@@ -58,4 +58,24 @@ class ScheduleService(
             )
         }
     }
+
+    fun getSchedulesByStatus(status: ScheduleStatus?): List<ScheduleDto> {
+        val schedules = if (status != null) {
+            scheduleRepository.findByStatus(status)
+        } else {
+            scheduleRepository.findAll()
+        }
+
+        return schedules.map { schedule ->
+            ScheduleDto(
+                id = schedule.id,
+                startDateTime = schedule.startDateTime,
+                endDateTime = schedule.endDateTime,
+                createdAt = schedule.createdAt,
+                updatedAt = schedule.updatedAt,
+                status = schedule.status
+            )
+        }
+    }
+
 }
