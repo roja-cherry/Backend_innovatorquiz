@@ -3,7 +3,6 @@ package com.iq.quiz.controller
 import com.iq.quiz.Dto.ScheduleDto
 import com.iq.quiz.Dto.schedule.ScheduleEditCreateRequest
 import com.iq.quiz.Entity.Schedule
-import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.service.ScheduleService
 import jakarta.validation.Valid
@@ -70,7 +69,6 @@ class ScheduleController(
 
 
     @PatchMapping("/{id}/reschedule")
-    @PatchMapping("/{id}/rescedule")
     fun reschedule(
         @PathVariable id:String,
         @RequestBody @Valid request:ScheduleEditCreateRequest
