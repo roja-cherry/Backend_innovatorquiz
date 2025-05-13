@@ -53,9 +53,10 @@ class AdminService(
     }
 
 
-    fun getQuizDto(quizId: String): QuizDTO? {
-        val quiz = quizRepository.findByQuizId(quizId) ?: throw QuizNotFoundException("Quiz Not Found")
-        return (quizToQuizDto(quiz))
+    fun getQuizDto(quizId: String): QuizDTO {
+        val quiz = quizRepository.findByQuizId(quizId)
+            ?: throw QuizNotFoundException("Quiz Not Found")
+        return quizToQuizDto(quiz)
     }
 
     @Transactional
@@ -99,14 +100,21 @@ class AdminService(
         )
     }
 
-    fun quizToQuizDto(quiz: Quiz): QuizDTO {
+    private fun quizToQuizDto(quiz: Quiz): QuizDTO {
+        val scheduled = scheduleRepository.existsByQuizQuizIdAndStatusIn(
+            quizId   = quiz.quizId!!,
+            statuses = listOf(ScheduleStatus.SCHEDULED, ScheduleStatus.LIVE)
+        )
+
         return QuizDTO(
-            quizId = quiz.quizId,
-            quizName = quiz.quizName,
-            timer = quiz.timer,
-            createdAt = quiz.createdAt,
+            quizId      = quiz.quizId,
+            quizName    = quiz.quizName,
+            timer       = quiz.timer,
+            createdAt   = quiz.createdAt,
+            isScheduled = scheduled
         )
     }
+
 
     fun questionToQuestionsDto(question: Question): QuestionDTO {
         return QuestionDTO(
