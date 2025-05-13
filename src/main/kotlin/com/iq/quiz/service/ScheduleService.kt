@@ -77,7 +77,9 @@ class ScheduleService(
                 endDateTime = schedule.endDateTime,
                 createdAt = schedule.createdAt,
                 updatedAt = schedule.updatedAt,
-                status = schedule.status
+                status = schedule.status,
+                quizId = schedule.quiz.quizId!!,
+                quizTitle = schedule.quiz.quizName
             )
         }
     }
