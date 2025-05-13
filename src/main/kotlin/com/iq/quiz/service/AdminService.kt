@@ -4,8 +4,10 @@ import com.iq.quiz.Dto.*
 import com.iq.quiz.Entity.Question
 import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.QuizStatus
+import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.Repository.QuestionRepository
 import com.iq.quiz.Repository.QuizRepository
+import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.exception.FileFormatException
 import com.iq.quiz.exception.QuizException
 import com.iq.quiz.exception.QuizNotFoundException
@@ -20,7 +22,8 @@ import java.time.LocalDateTime
 @Service
 class AdminService(
     private val quizRepository: QuizRepository,
-    private val questionRepository: QuestionRepository
+    private val questionRepository: QuestionRepository,
+    private val scheduleRepository: ScheduleRepository
 ) {
 
     @Transactional
@@ -194,11 +197,16 @@ class AdminService(
                 else -> quiz.createdAt?.isAfter(cutoffDate) == true
             })
         }.map { quiz ->
+            val scheduled = scheduleRepository.existsByQuizQuizIdAndStatusIn(
+                quizId = quiz.quizId!!,
+                statuses = listOf(ScheduleStatus.SCHEDULED, ScheduleStatus.LIVE)
+            )
             QuizDTO(
-                quizId = quiz.quizId,
-                quizName = quiz.quizName,
-                timer = quiz.timer,
-                createdAt = quiz.createdAt,
+                quizId     = quiz.quizId,
+                quizName   = quiz.quizName,
+                timer      = quiz.timer,
+                createdAt  = quiz.createdAt,
+                isScheduled = scheduled
             )
         }
     }
