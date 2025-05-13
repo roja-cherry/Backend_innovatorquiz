@@ -13,6 +13,8 @@ data class ScheduleDto(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val status: ScheduleStatus,
+    val quizTitle: String,
+    val quizId: String
 
 
 )
