@@ -21,7 +21,7 @@ class ScheduleController(
 
     @PostMapping
     fun createNewSchedule(@RequestBody @Valid dto: ScheduleEditCreateRequest): ResponseEntity<Schedule> {
-        val response = scheduleService.createNewQuiz(dto)
+        val response = scheduleService.createNewSchedule(dto)
         return ResponseEntity.status(201).body(response)
     }
 

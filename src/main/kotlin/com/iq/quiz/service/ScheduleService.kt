@@ -16,7 +16,7 @@ class ScheduleService(
     private val quizRepository: QuizRepository
 ) {
 
-    fun createNewQuiz(dto: ScheduleEditCreateRequest): Schedule {
+    fun createNewSchedule(dto: ScheduleEditCreateRequest): Schedule {
         val quiz = quizRepository.findByQuizId(dto.quizId)
             ?: throw QuizNotFoundException("Quiz not found with id ${dto.quizId}")
 
@@ -42,7 +42,9 @@ class ScheduleService(
             endDateTime = schedule.endDateTime,
             createdAt = schedule.createdAt,
             updatedAt = schedule.updatedAt,
-            status = schedule.status
+            status = schedule.status,
+            quizId = schedule.quiz.quizId!!,
+            quizTitle = schedule.quiz.quizName
         )
     }
 
@@ -54,7 +56,9 @@ class ScheduleService(
                 endDateTime = schedule.endDateTime,
                 createdAt = schedule.createdAt,
                 updatedAt = schedule.updatedAt,
-                status = schedule.status
+                status = schedule.status,
+                quizId = schedule.quiz.quizId!!,
+                quizTitle = schedule.quiz.quizName
             )
         }
     }
