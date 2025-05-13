@@ -20,7 +20,7 @@ data class Schedule(
 
     val createdAt: LocalDateTime,
 
-    val updatedAt: LocalDateTime,
+    var updatedAt: LocalDateTime,
 
     @Enumerated(EnumType.STRING)
     var status: ScheduleStatus,

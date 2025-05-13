@@ -66,4 +66,22 @@ class ScheduleService(
             )
         }
     }
+
+    fun reschedule(id: String,request: ScheduleEditCreateRequest): Schedule {
+
+        val existingSchedule = scheduleRepository.findById(id)
+            .orElseThrow { IllegalArgumentException("Schedule not found with ID: ${id}") }
+        if (existingSchedule.status != ScheduleStatus.CANCELLED)
+        {
+            throw IllegalStateException("Only Cancelled Schedules can be Reschedulled")
+        }
+        existingSchedule.startDateTime=request.startDateTime
+        existingSchedule.endDateTime=request.endDateTime
+        existingSchedule.updatedAt= LocalDateTime.now()
+        existingSchedule.status=ScheduleStatus.SCHEDULED
+
+        return scheduleRepository.save(existingSchedule)
+    }
+
+
 }

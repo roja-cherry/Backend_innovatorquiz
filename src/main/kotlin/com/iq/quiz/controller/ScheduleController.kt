@@ -3,6 +3,7 @@ package com.iq.quiz.controller
 import com.iq.quiz.Dto.ScheduleDto
 import com.iq.quiz.Dto.schedule.ScheduleEditCreateRequest
 import com.iq.quiz.Entity.Schedule
+import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.service.ScheduleService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -41,5 +42,14 @@ class ScheduleController(
     @GetMapping
     fun getAllSchedules(): List<ScheduleDto> {
         return scheduleService.getAllSchedules()
+    }
+
+    @PatchMapping("/{id}/rescedule")
+    fun reschedule(
+        @PathVariable id:String,
+        @RequestBody @Valid request:ScheduleEditCreateRequest
+    ):ResponseEntity<Schedule>{
+        val response=scheduleService.reschedule(id,request)
+        return ResponseEntity.ok(response)
     }
 }
