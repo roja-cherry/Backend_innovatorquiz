@@ -46,12 +46,13 @@ class ScheduleController(
         return scheduleService.getScheduleById(id)
     }
 
-    @GetMapping("/all-schedule") //apply filtering condition
+    @GetMapping("/all-schedule")
     fun getAllSchedules(
-        @RequestParam status: ScheduleStatus?
+        @RequestParam(required = false) status: List<ScheduleStatus>?
     ): List<ScheduleDto> {
-        return scheduleService.getSchedulesByStatus(status)
+        return scheduleService.getSchedulesByStatuses(status)
     }
+
 
     @GetMapping("/quiz/{quizId}")
     fun getSchedulesByQuizId(@PathVariable quizId: String): ResponseEntity<List<ScheduleDto>> {
@@ -62,8 +63,8 @@ class ScheduleController(
 
 
     @GetMapping("/status")
-    fun getSchedulesByStatus(@RequestParam(required = false) status: ScheduleStatus?): List<ScheduleDto> {
-        return scheduleService.getSchedulesByStatus(status)
+    fun getSchedulesByStatus(@RequestParam(required = false) status: List<ScheduleStatus>?): List<ScheduleDto> {
+        return scheduleService.getSchedulesByStatuses(status)
     }
 
 
