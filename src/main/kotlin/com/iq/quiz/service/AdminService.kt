@@ -4,8 +4,10 @@ import com.iq.quiz.Dto.*
 import com.iq.quiz.Entity.Question
 import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.QuizStatus
+import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.Repository.QuestionRepository
 import com.iq.quiz.Repository.QuizRepository
+import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.exception.FileFormatException
 import com.iq.quiz.exception.QuizException
 import com.iq.quiz.exception.QuizNotFoundException
@@ -20,7 +22,8 @@ import java.time.LocalDateTime
 @Service
 class AdminService(
     private val quizRepository: QuizRepository,
-    private val questionRepository: QuestionRepository
+    private val questionRepository: QuestionRepository,
+    private val scheduleRepository: ScheduleRepository
 ) {
 
     @Transactional
@@ -62,35 +65,37 @@ class AdminService(
         timer: Int?,
         id: String
     ): QuizWithQuestionsDto {
+        // 1. Load or 404
         val quiz = quizRepository.findById(id)
-            .orElseThrow { QuizNotFoundException("Quiz not found") }
+            .orElseThrow { QuizNotFoundException("Quiz with id '$id' not found") }
 
-        // Check for duplicate name if quizName is being changed
-        if (quizName != null && quizName != quiz.quizName) {
-            val duplicateExists = quizRepository.existsByQuizName(quizName)
-            if (duplicateExists) {
-                throw ResponseStatusException(HttpStatus.CONFLICT, "A quiz with the name '$quizName' already exists.")
-            }
+        // 2. Prevent edits if already scheduled or live
+        val hasSchedule = scheduleRepository.existsByQuizQuizIdAndStatusIn(
+            quizId   = id,
+            statuses = listOf(ScheduleStatus.SCHEDULED, ScheduleStatus.LIVE)
+        )
+        if (hasSchedule) {
+            throw QuizException(
+                status  = HttpStatus.FORBIDDEN,
+                message = "Cannot edit quiz '${quiz.quizName}' once it’s scheduled or live."
+            )
         }
-
+        // 4. Apply updates
         val updatedQuiz = quiz.copy(
             quizName = quizName ?: quiz.quizName,
-            timer = timer ?: quiz.timer
+            timer    = timer    ?: quiz.timer
         )
-
-        if (file != null) {
+        // 5. Replace questions if file provided
+        file?.let {
             questionRepository.deleteAllByQuizQuizId(id)
-            val questions = extractQuestionsFromExcel(file, updatedQuiz)
-            questionRepository.saveAll(questions)
+            questionRepository.saveAll(extractQuestionsFromExcel(it, updatedQuiz))
         }
 
         quizRepository.save(updatedQuiz)
-        val questions = questionRepository.findByQuizQuizId(id)
-        val questionsDto = questions.map { questionToQuestionsDto(it) }
 
         return QuizWithQuestionsDto(
-            quiz = quizToQuizDto(updatedQuiz),
-            questions = questionsDto
+            quiz      = quizToQuizDto(updatedQuiz),
+            questions = questionRepository.findByQuizQuizId(id).map(::questionToQuestionsDto)
         )
     }
 
@@ -102,7 +107,6 @@ class AdminService(
             createdAt = quiz.createdAt,
         )
     }
-
 
     fun questionToQuestionsDto(question: Question): QuestionDTO {
         return QuestionDTO(
@@ -194,11 +198,16 @@ class AdminService(
                 else -> quiz.createdAt?.isAfter(cutoffDate) == true
             })
         }.map { quiz ->
+            val scheduled = scheduleRepository.existsByQuizQuizIdAndStatusIn(
+                quizId = quiz.quizId!!,
+                statuses = listOf(ScheduleStatus.SCHEDULED, ScheduleStatus.LIVE)
+            )
             QuizDTO(
-                quizId = quiz.quizId,
-                quizName = quiz.quizName,
-                timer = quiz.timer,
-                createdAt = quiz.createdAt,
+                quizId     = quiz.quizId,
+                quizName   = quiz.quizName,
+                timer      = quiz.timer,
+                createdAt  = quiz.createdAt,
+                isScheduled = scheduled
             )
         }
     }
@@ -216,7 +225,19 @@ class AdminService(
     @Transactional
     fun deleteQuizById(quizId: String) {
         val quiz = quizRepository.findByQuizId(quizId)
-            ?: throw QuizNotFoundException("Quiz not found with ID: $quizId")
+            ?: throw QuizNotFoundException("Quiz with id '$quizId' not found")
+
+        // Block if scheduled/live
+        val hasSchedule = scheduleRepository.existsByQuizQuizIdAndStatusIn(
+            quizId   = quizId,
+            statuses = listOf(ScheduleStatus.SCHEDULED, ScheduleStatus.LIVE)
+        )
+        if (hasSchedule) {
+            throw QuizException(
+                status  = HttpStatus.FORBIDDEN,
+                message = "Cannot delete quiz '${quiz.quizName}' once it’s scheduled or live."
+            )
+        }
 
         questionRepository.deleteAllByQuizQuizId(quizId)
         quizRepository.delete(quiz)

@@ -20,10 +20,10 @@ data class Schedule(
 
     val createdAt: LocalDateTime,
 
-    val updatedAt: LocalDateTime,
+    var updatedAt: LocalDateTime,
 
     @Enumerated(EnumType.STRING)
-    val status: ScheduleStatus,
+    var status: ScheduleStatus,
 
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)

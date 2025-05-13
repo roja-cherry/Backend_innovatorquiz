@@ -10,5 +10,7 @@ data class QuizDTO(
     val quizName: String,
     val timer: Int,
     val createdAt: LocalDateTime? = null,
+
+    val isScheduled: Boolean = false
 )
 
