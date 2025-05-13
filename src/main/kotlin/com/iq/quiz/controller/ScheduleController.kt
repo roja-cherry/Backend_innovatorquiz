@@ -52,8 +52,8 @@ class ScheduleController(
         return scheduleService.getAllSchedules()
     }
 
-    @GetMapping("/quiz/{id}")
-    fun getSchedulesByQuizId(@PathVariable quizId: String): ResponseEntity<List<Unit>> {
+    @GetMapping("/quiz/{quizId}")
+    fun getSchedulesByQuizId(@PathVariable quizId: String): ResponseEntity<List<ScheduleDto>> {
         val schedules = scheduleService.getSchedulesByQuizId(quizId)
         return ResponseEntity.ok(schedules)
     }

@@ -119,7 +119,7 @@ class ScheduleService(
 
 
 
-    fun getSchedulesByQuizId(quizId: String): List<Unit> {
+    fun getSchedulesByQuizId(quizId: String): List<ScheduleDto>  {
         val schedules = scheduleRepository.findByQuizQuizId(quizId)
         return schedules.map { schedule -> scheduleToDto(schedule) }
     }
