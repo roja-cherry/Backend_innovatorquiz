@@ -2,6 +2,7 @@ package com.iq.quiz.Repository
 
 import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.Schedule
+import com.iq.quiz.Entity.ScheduleStatus
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -24,5 +25,8 @@ interface ScheduleRepository: JpaRepository<Schedule, String> {
         @Param("end") end: LocalDateTime?
     ): Boolean
 
+
+    // returns true if there’s any schedule in SCHEDULED (or LIVE) state for this quiz
+    fun existsByQuizQuizIdAndStatusIn(quizId: String, statuses: Collection<ScheduleStatus>): Boolean
 
 }
