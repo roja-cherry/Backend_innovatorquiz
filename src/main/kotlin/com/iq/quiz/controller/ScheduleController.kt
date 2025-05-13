@@ -54,6 +54,13 @@ class ScheduleController(
         return scheduleService.getSchedulesByStatus(status)
     }
 
+    @GetMapping("/quiz/{quizId}")
+    fun getSchedulesByQuizId(@PathVariable quizId: String): ResponseEntity<List<ScheduleDto>> {
+        val schedules = scheduleService.getSchedulesByQuizId(quizId)
+        return ResponseEntity.ok(schedules)
+    }
+
+
 
     @GetMapping("/status")
     fun getSchedulesByStatus(@RequestParam(required = false) status: ScheduleStatus?): List<ScheduleDto> {
@@ -61,6 +68,8 @@ class ScheduleController(
     }
 
 
+
+    @PatchMapping("/{id}/reschedule")
     @PatchMapping("/{id}/rescedule")
     fun reschedule(
         @PathVariable id:String,

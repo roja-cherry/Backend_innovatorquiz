@@ -27,8 +27,21 @@ interface ScheduleRepository: JpaRepository<Schedule, String> {
         @Param("end") end: LocalDateTime?
     ): Boolean
 
-
-    // returns true if there’s any schedule in SCHEDULED (or LIVE) state for this quiz
     fun existsByQuizQuizIdAndStatusIn(quizId: String, statuses: Collection<ScheduleStatus>): Boolean
+
+    fun findByQuizQuizId(quizId: String): List<Schedule>
+
+
+    @Query("""
+    SELECT COUNT(s) > 0 FROM Schedule s
+    WHERE s.startDateTime < :end
+      AND s.endDateTime > :start
+      AND s.id <> :excludeId
+""")
+    fun existsByTimeRangeOverlapExcludesGivenSchedule(
+        @Param("start") start: LocalDateTime,
+        @Param("end") end: LocalDateTime,
+        @Param("excludeId") excludeId: String
+    ): Boolean
 
 }

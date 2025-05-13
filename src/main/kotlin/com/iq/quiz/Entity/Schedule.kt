@@ -29,3 +29,4 @@ data class Schedule(
     @JoinColumn(name = "quiz_id", nullable = false)
     val quiz : Quiz,
 )
+

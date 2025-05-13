@@ -65,12 +65,13 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ScheduleException::class)
-    fun handleDataIntegrityException(ex: ScheduleException): ResponseEntity<ErrorResponse> {
+    fun handleScheduleException(ex: ScheduleException): ResponseEntity<ErrorResponse> {
         val response = ErrorResponse(
             timestamp = LocalDateTime.now(),
             message = ex.message,
             status = HttpStatus.BAD_REQUEST.value()
         )
+        ex.printStackTrace()
         return ResponseEntity.status(ex.status).body(response)
     }
 

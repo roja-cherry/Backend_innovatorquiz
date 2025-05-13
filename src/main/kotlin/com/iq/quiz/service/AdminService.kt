@@ -188,7 +188,8 @@ class AdminService(
     fun getAllQuizzesForAdmin(
         isActive: Boolean,
         status: QuizStatus?,
-        createdWithin: String? // "1m", "3m", "6m", "before6m"
+        createdWithin: String?, // "1m", "3m", "6m", "before6m"
+        isScheduled: Boolean? = null
     ): List<QuizDTO> {
         val now = LocalDateTime.now()
 
@@ -200,24 +201,37 @@ class AdminService(
             else -> null
         }
 
-        return quizRepository.findAll().filter { quiz ->
-            (createdWithin == null || when (createdWithin) {
-                "before6m" -> quiz.createdAt?.isBefore(cutoffDate) == true
-                else -> quiz.createdAt?.isAfter(cutoffDate) == true
-            })
-        }.map { quiz ->
-            val scheduled = scheduleRepository.existsByQuizQuizIdAndStatusIn(
-                quizId = quiz.quizId!!,
-                statuses = listOf(ScheduleStatus.SCHEDULED, ScheduleStatus.LIVE)
-            )
-            QuizDTO(
-                quizId     = quiz.quizId,
-                quizName   = quiz.quizName,
-                timer      = quiz.timer,
-                createdAt  = quiz.createdAt,
-                isScheduled = scheduled
-            )
-        }
+        return quizRepository.findAll()
+            // 1) existing filters
+            .filter { quiz ->
+                (status == null )
+                        && (createdWithin == null || when (createdWithin) {
+                    "before6m" -> quiz.createdAt?.isBefore(cutoffDate) == true
+                    else       -> quiz.createdAt?.isAfter(cutoffDate)  == true
+                })
+            }
+            // 2) map to include scheduled flag
+            .map { quiz ->
+                val scheduled = scheduleRepository.existsByQuizQuizIdAndStatusIn(
+                    quizId   = quiz.quizId!!,
+                    statuses = listOf(ScheduleStatus.SCHEDULED, ScheduleStatus.LIVE)
+                )
+                quiz to scheduled
+            }
+            // 3) apply the new scheduled filter
+            .filter { (_, scheduled) ->
+                isScheduled == null || scheduled == isScheduled
+            }
+            // 4) finally map into DTOs
+            .map { (quiz, scheduled) ->
+                QuizDTO(
+                    quizId      = quiz.quizId,
+                    quizName    = quiz.quizName,
+                    timer       = quiz.timer,
+                    createdAt   = quiz.createdAt,
+                    isScheduled = scheduled
+                )
+            }
     }
 
 

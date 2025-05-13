@@ -9,6 +9,7 @@ import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.exception.QuizNotFoundException
 import com.iq.quiz.exception.ScheduleException
 import org.springframework.http.HttpStatus
+import com.iq.quiz.mapper.scheduleToDto
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -34,7 +35,7 @@ class ScheduleService(
 
         val isScheduleExistsBetweenTime = scheduleRepository.existsByTimeRangeOverlap(dto.startDateTime, dto.endDateTime)
         if(isScheduleExistsBetweenTime) {
-            throw ScheduleException("A quiz is already scheduled between this this", HttpStatus.BAD_REQUEST)
+            throw ScheduleException("A quiz is already scheduled between this time range", HttpStatus.BAD_REQUEST)
         }
 
         val schedule = Schedule(
@@ -106,9 +107,15 @@ class ScheduleService(
 
         val existingSchedule = scheduleRepository.findById(id)
             .orElseThrow { IllegalArgumentException("Schedule not found with ID: ${id}") }
-        if (existingSchedule.status != ScheduleStatus.CANCELLED)
-        {
-            throw IllegalStateException("Only Cancelled Schedules can be Reschedulled")
+
+        val isAnyOtherScheduled = scheduleRepository.existsByTimeRangeOverlapExcludesGivenSchedule(
+            request.startDateTime,
+            request.endDateTime,
+            id
+        )
+        println("ISSUEEE:\n\n\n$isAnyOtherScheduled")
+        if(isAnyOtherScheduled) {
+            throw ScheduleException("A quiz is already scheduled between this time range", HttpStatus.BAD_REQUEST)
         }
         existingSchedule.startDateTime=request.startDateTime
         existingSchedule.endDateTime=request.endDateTime
@@ -119,4 +126,9 @@ class ScheduleService(
     }
 
 
+
+    fun getSchedulesByQuizId(quizId: String): List<ScheduleDto>  {
+        val schedules = scheduleRepository.findByQuizQuizId(quizId)
+        return schedules.map { schedule -> scheduleToDto(schedule) }
+    }
 }
