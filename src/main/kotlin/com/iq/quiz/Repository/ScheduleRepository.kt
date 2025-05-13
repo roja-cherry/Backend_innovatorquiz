@@ -14,6 +14,8 @@ import java.time.LocalDateTime
 @Repository
 interface ScheduleRepository: JpaRepository<Schedule, String> {
     fun findAllByQuiz(quiz: Quiz): List<Schedule>
+    fun findByStatus(status: ScheduleStatus): List<Schedule>
+
 
     @Query(
         ("SELECT COUNT(s) > 0 FROM Schedule s " +
