@@ -14,9 +14,9 @@ import com.iq.quiz.mapper.quizToDto
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDateTime
 
 @Service
 class QuizService(
@@ -36,7 +36,12 @@ class QuizService(
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "A quiz with the name '$quizName' already exists.")
         }
 
-        val quiz = Quiz(quizName = quizName, timer = timer, status = QuizStatus.CREATED)
+        val quiz = Quiz(
+            quizName = quizName,
+            timer = timer,
+            status = QuizStatus.CREATED,
+            createdAt = LocalDateTime.now()
+        )
         val savedQuiz = quizRepository.save(quiz)
 
         val questions = excelService.extractQuestionsFromExcel(file, savedQuiz)

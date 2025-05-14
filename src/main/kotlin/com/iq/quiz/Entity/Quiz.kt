@@ -16,7 +16,7 @@ data class Quiz(
     val quizName : String,
 
     val timer : Long,
-    val createdAt: LocalDateTime ?= null,
+    val createdAt: LocalDateTime,
 
     @Enumerated(EnumType.STRING)
     val status: QuizStatus
