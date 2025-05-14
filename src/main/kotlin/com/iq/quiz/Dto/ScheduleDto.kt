@@ -11,10 +11,12 @@ data class ScheduleDto(
     val startDateTime: LocalDateTime? = null,
     val endDateTime: LocalDateTime? = null,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
+    val updatedAt: LocalDateTime?,
     val status: ScheduleStatus,
     val quizTitle: String,
     val quizId: String
-
-
-)
+) {
+    fun getStatusText(): String {
+        return status.getStatusText()
+    }
+}

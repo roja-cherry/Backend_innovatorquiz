@@ -9,6 +9,7 @@ import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.exception.QuizNotFoundException
 import com.iq.quiz.exception.ScheduleException
 import org.springframework.http.HttpStatus
+import com.iq.quiz.mapper.scheduleToDto
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -79,27 +80,58 @@ class ScheduleService(
             )
         }
     }
+//
+//    fun getSchedulesByStatus(status: ScheduleStatus?): List<ScheduleDto> {
+//
+//        /**
+//         *
+//         * if status === SCHEDULED_AND_LIVE ? return scheduled and live,
+//         * else return varunna status
+//         *
+//         * in repo find by status should accept array of status like:
+//         *          fun findByStatuses(statuses: List<ScheduleStatus>): List<Schedule>
+//         *
+//         */
+//        val schedules = if (status != null) {
+//            scheduleRepository.findByStatus(status)
+//        } else {
+//            scheduleRepository.findAll()
+//        }
+//
+//        return schedules.map { schedule ->
+//            ScheduleDto(
+//                id = schedule.id,
+//                startDateTime = schedule.startDateTime,
+//                endDateTime = schedule.endDateTime,
+//                createdAt = schedule.createdAt,
+//                updatedAt = schedule.updatedAt,
+//                status = schedule.status,
+//                quizTitle = schedule.quiz.quizName,
+//                quizId = schedule.quiz.quizId!!
+//            )
+//        }
+//    }
+fun getSchedulesByStatuses(statuses: List<ScheduleStatus>?): List<ScheduleDto> {
+    val schedules = if (!statuses.isNullOrEmpty()) {
+        scheduleRepository.findByStatusIn(statuses)
 
-    fun getSchedulesByStatus(status: ScheduleStatus?): List<ScheduleDto> {
-        val schedules = if (status != null) {
-            scheduleRepository.findByStatus(status)
-        } else {
-            scheduleRepository.findAll()
-        }
-
-        return schedules.map { schedule ->
-            ScheduleDto(
-                id = schedule.id,
-                startDateTime = schedule.startDateTime,
-                endDateTime = schedule.endDateTime,
-                createdAt = schedule.createdAt,
-                updatedAt = schedule.updatedAt,
-                status = schedule.status,
-                quizTitle = schedule.quiz.quizName,
-                quizId = schedule.quiz.quizId!!
-            )
-        }
+    } else {
+        scheduleRepository.findAll()
     }
+
+    return schedules.map { schedule ->
+        ScheduleDto(
+            id = schedule.id,
+            startDateTime = schedule.startDateTime,
+            endDateTime = schedule.endDateTime,
+            createdAt = schedule.createdAt,
+            updatedAt = schedule.updatedAt,
+            status = schedule.status,
+            quizTitle = schedule.quiz.quizName,
+            quizId = schedule.quiz.quizId!!
+        )
+    }
+}
 
 
     fun reschedule(id: String,request: ScheduleEditCreateRequest): Schedule {
@@ -112,7 +144,7 @@ class ScheduleService(
             request.endDateTime,
             id
         )
-        println("ISSUEEE:\n\n\n$isAnyOtherScheduled")
+
         if(isAnyOtherScheduled) {
             throw ScheduleException("A quiz is already scheduled between this time range", HttpStatus.BAD_REQUEST)
         }
@@ -125,4 +157,8 @@ class ScheduleService(
     }
 
 
+    fun getSchedulesByQuizId(quizId: String): List<ScheduleDto>  {
+        val schedules = scheduleRepository.findByQuizQuizId(quizId)
+        return schedules.map { schedule -> scheduleToDto(schedule) }
+    }
 }
