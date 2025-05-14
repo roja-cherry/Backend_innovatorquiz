@@ -4,7 +4,6 @@ import com.iq.quiz.Dto.ScheduleDto
 import com.iq.quiz.Dto.schedule.ScheduleEditCreateRequest
 import com.iq.quiz.Entity.Schedule
 import com.iq.quiz.Entity.ScheduleStatus
-import com.iq.quiz.service.ScheduleService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
 
+/**
 @RestController
 @RequestMapping("/api/schedule")
 class ScheduleController(
@@ -89,3 +89,5 @@ class ScheduleController(
         return response
     }
 }
+
+ */
