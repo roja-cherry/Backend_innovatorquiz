@@ -1,6 +1,5 @@
 package com.iq.quiz.service
 
-import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
 import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.QuizStatus
@@ -8,6 +7,7 @@ import com.iq.quiz.Repository.QuestionRepository
 import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.exception.FileFormatException
+import com.iq.quiz.exception.QuizException
 import com.iq.quiz.exception.QuizNotFoundException
 import com.iq.quiz.mapper.questionToDto
 import com.iq.quiz.mapper.quizToDto
@@ -52,6 +52,9 @@ class QuizService(
     fun editQuiz(id: String, quizName: String, timer: Long, file: MultipartFile?): QuizWithQuestionsDto {
         val quiz = quizRepository.findById(id)
             .orElseThrow { QuizNotFoundException("Quiz with id '$id' not found") }
+
+        if(quiz.status != QuizStatus.CREATED && quiz.status != QuizStatus.PUBLISHED)
+            throw QuizException("Can't edit quiz, status is ${quiz.status.text}", HttpStatus.BAD_REQUEST)
 
         val updatedQuiz = quiz.copy(
             quizName = quizName,

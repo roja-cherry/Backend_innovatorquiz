@@ -10,14 +10,15 @@ data class Quiz(
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val quizId : String ?= null,
+    val quizId: String ?= null,
 
     @Column(unique = true)
     val quizName : String,
 
     val timer : Long,
-    var createdAt: LocalDateTime ?= null,
+    val createdAt: LocalDateTime ?= null,
 
+    @Enumerated(EnumType.STRING)
     val status: QuizStatus
 )
 
