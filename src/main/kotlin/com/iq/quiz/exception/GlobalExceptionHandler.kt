@@ -17,7 +17,7 @@ fun getDuplicateFieldMessage(msg: String): String {
         val value = matchResult.groupValues[2]   // e.g., "GK"
         return  "Duplicate value $value for field $column"
     }
-    return "An error occurred while saving fields"
+    return "An error occurred!"
 }
 
 @RestControllerAdvice
