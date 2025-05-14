@@ -55,8 +55,8 @@ class ScheduleService(
             RuntimeException("Schedule not found")
         }
         schedule.status = ScheduleStatus.CANCELLED // Updating status to CANCELLED
-        schedule.startDateTime = null
-        schedule.endDateTime = null
+//        schedule.startDateTime=null
+//        schedule.endDateTime=null
         return scheduleRepository.save(schedule) // Save changes
     }
 
@@ -178,5 +178,11 @@ class ScheduleService(
         val spec = scheduleSpecification(startDate, endDate, status)
         val schedules = scheduleRepository.findAll(spec, sort)
         return schedules.map { schedule -> scheduleToDto(schedule) }
+    }
+
+    fun deleteScheduleById(id: String): String {
+        scheduleRepository.deleteById(id)
+        return "Deleted Successfully"
+
     }
 }
