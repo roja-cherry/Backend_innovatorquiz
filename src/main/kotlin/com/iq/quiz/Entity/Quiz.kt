@@ -15,8 +15,9 @@ data class Quiz(
     @Column(unique = true)
     val quizName : String,
 
-
     val timer : Int,
     var createdAt: LocalDateTime ?= null,
+
+    val status: QuizStatus
 )
 

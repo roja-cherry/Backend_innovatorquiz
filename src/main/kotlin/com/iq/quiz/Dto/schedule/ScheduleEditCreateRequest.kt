@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Future
 import java.time.LocalDateTime
 
 data class ScheduleEditCreateRequest(
-    val id: String ?= null,
+    val id: String? = null,
 
     @field:Future
     val startDateTime: LocalDateTime,

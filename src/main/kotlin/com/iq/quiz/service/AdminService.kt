@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 
+@Deprecated("no need")
 @Service
 class AdminService(
     private val quizRepository: QuizRepository,
@@ -26,6 +27,7 @@ class AdminService(
     private val scheduleRepository: ScheduleRepository
 ) {
 
+    /**
     @Transactional
     fun processQuizFile(file: MultipartFile, quizName: String, timer: Int): QuizWithQuestionsDto {
         if (file.isEmpty) {
@@ -302,4 +304,6 @@ class AdminService(
             questions = questionDtos
         )
     }
+
+    */
 }

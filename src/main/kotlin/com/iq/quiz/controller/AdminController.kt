@@ -3,7 +3,6 @@ package com.iq.quiz.controller
 import com.iq.quiz.Dto.PublishQuizRequest
 import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
-import com.iq.quiz.Dto.UpdateIsActive
 import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.service.AdminService
 import jakarta.validation.Valid
