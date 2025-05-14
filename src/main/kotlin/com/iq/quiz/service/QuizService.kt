@@ -79,4 +79,23 @@ class QuizService(
             questions = questions
         )
     }
+
+    @Transactional
+    fun deleteQuiz(quizId: String) {
+        val quiz = quizRepository.findById(quizId)
+            .orElseThrow { QuizNotFoundException("Quiz with id '$quizId' not found") }
+
+        if (quiz.status != QuizStatus.CREATED && quiz.status != QuizStatus.COMPLETED) {
+            throw QuizException(
+                "Only quizzes with status 'Created' or 'Completed' can be deleted. Current status: ${quiz.status.text}",
+                HttpStatus.BAD_REQUEST
+            )
+        }
+
+        // Delete associated questions first
+        questionRepository.deleteAllByQuizQuizId(quizId)
+
+        // Delete the quiz
+        quizRepository.deleteById(quizId)
+    }
 }
