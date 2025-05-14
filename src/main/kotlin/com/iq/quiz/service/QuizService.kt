@@ -15,7 +15,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 
 @Service
@@ -32,8 +31,8 @@ class QuizService(
             throw FileFormatException("Uploaded file is empty.")
         }
 
-        if (quizRepository.existsByQuizName(quizName)) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "A quiz with the name '$quizName' already exists.")
+        if(timer < 5 || timer > 60) {
+            throw QuizException("Timer should between 5 to 60 minutes", HttpStatus.BAD_REQUEST)
         }
 
         val quiz = Quiz(
@@ -54,7 +53,7 @@ class QuizService(
     }
 
     @Transactional
-    fun editQuiz(id: String, quizName: String, timer: Long, file: MultipartFile?): QuizWithQuestionsDto {
+    fun editQuiz(id: String, quizName: String?, timer: Long?, file: MultipartFile?): QuizWithQuestionsDto {
         val quiz = quizRepository.findById(id)
             .orElseThrow { QuizNotFoundException("Quiz with id '$id' not found") }
 
@@ -62,8 +61,8 @@ class QuizService(
             throw QuizException("Can't edit quiz, status is ${quiz.status.text}", HttpStatus.BAD_REQUEST)
 
         val updatedQuiz = quiz.copy(
-            quizName = quizName,
-            timer    = timer
+            quizName = quizName ?: quiz.quizName,
+            timer    = timer ?: quiz?.timer!!
         )
 
         file?.let {
