@@ -77,4 +77,10 @@ class ScheduleController(
         val response=scheduleService.reschedule(id,request)
         return ResponseEntity.ok(response)
     }
+
+    @DeleteMapping("/{id}")
+    fun deleteSchedule(@PathVariable id:String):String{
+        val response = scheduleService.deleteScheduleById(id)
+        return response
+    }
 }
