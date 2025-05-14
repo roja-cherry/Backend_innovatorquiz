@@ -20,7 +20,7 @@ data class Schedule(
 
     val createdAt: LocalDateTime,
 
-    var updatedAt: LocalDateTime,
+    var updatedAt: LocalDateTime ?,
 
     @Enumerated(EnumType.STRING)
     var status: ScheduleStatus,
@@ -28,5 +28,15 @@ data class Schedule(
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)
     val quiz : Quiz,
-)
+) {
+    @PrePersist
+    fun onCreate() {
+        updatedAt = LocalDateTime.now()
+    }
+
+    @PreUpdate
+    fun onUpdate() {
+        updatedAt = LocalDateTime.now()
+    }
+}
 
