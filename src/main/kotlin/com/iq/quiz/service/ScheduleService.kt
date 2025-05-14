@@ -177,4 +177,10 @@ fun getSchedulesByStatuses(statuses: List<ScheduleStatus>?): List<ScheduleDto> {
         val schedules = scheduleRepository.findAll(spec, sort)
         return schedules.map { schedule -> scheduleToDto(schedule) }
     }
+
+    fun deleteScheduleById(id: String): String {
+        scheduleRepository.deleteById(id)
+        return "Deleted Successfully"
+
+    }
 }
