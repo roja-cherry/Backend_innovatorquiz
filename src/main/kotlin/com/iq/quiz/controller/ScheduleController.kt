@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/schedule")
@@ -46,11 +47,15 @@ class ScheduleController(
         return scheduleService.getScheduleById(id)
     }
 
-    @GetMapping("/all-schedule")
+    @GetMapping
     fun getAllSchedules(
-        @RequestParam(required = false) status: List<ScheduleStatus>?
+        @RequestParam(required = false) status: List<ScheduleStatus>?,
+        @RequestParam search: String?,
+        @RequestParam(defaultValue = "updatedAt") sortBy: String?,
+        @RequestParam startDate: LocalDateTime?,
+        @RequestParam endDate: LocalDateTime?
     ): List<ScheduleDto> {
-        return scheduleService.getSchedulesByStatuses(status)
+        return scheduleService.getAllSchedulesFiltered(sortBy, search, startDate, endDate, status)
     }
 
 
