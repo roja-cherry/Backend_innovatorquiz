@@ -55,8 +55,8 @@ class ScheduleService(
             RuntimeException("Schedule not found")
         }
         schedule.status = ScheduleStatus.CANCELLED // Updating status to CANCELLED
-        schedule.startDateTime=null
-        schedule.endDateTime=null
+//        schedule.startDateTime=null
+//        schedule.endDateTime=null
         return scheduleRepository.save(schedule) // Save changes
     }
 
