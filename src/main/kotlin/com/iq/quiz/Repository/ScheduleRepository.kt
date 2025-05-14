@@ -4,6 +4,7 @@ import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.Schedule
 import com.iq.quiz.Entity.ScheduleStatus
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
@@ -13,7 +14,7 @@ import java.time.LocalDateTime
 
 
 @Repository
-interface ScheduleRepository: JpaRepository<Schedule, String> {
+interface ScheduleRepository: JpaRepository<Schedule, String>,JpaSpecificationExecutor<Schedule> {
     fun findAllByQuiz(quiz: Quiz): List<Schedule>
     fun findByStatusIn(statuses: List<ScheduleStatus>): List<Schedule>
 

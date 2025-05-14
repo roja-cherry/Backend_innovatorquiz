@@ -10,8 +10,40 @@ import com.iq.quiz.exception.QuizNotFoundException
 import com.iq.quiz.exception.ScheduleException
 import org.springframework.http.HttpStatus
 import com.iq.quiz.mapper.scheduleToDto
+import jakarta.persistence.criteria.Predicate
+import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+
+private fun scheduleSpecification(
+    startDateTime: LocalDateTime? = null,
+    endDateTime: LocalDateTime? = null,
+    statuses: List<ScheduleStatus>? = null
+): Specification<Schedule> {
+    return Specification { root, _, cb ->
+        val predicates = mutableListOf<Predicate>()
+
+        // Default to SCHEDULED if statuses not provided
+        val effectiveStatuses = statuses ?: listOf(ScheduleStatus.SCHEDULED)
+
+        // Filter by status list
+        predicates.add(root.get<ScheduleStatus>("status").`in`(effectiveStatuses))
+
+        // Optional: Filter by startDateTime >= ...
+        startDateTime?.let {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("startDateTime"), it))
+        }
+
+        // Optional: Filter by endDateTime <= ...
+        endDateTime?.let {
+            predicates.add(cb.lessThanOrEqualTo(root.get("endDateTime"), it))
+        }
+
+        cb.and(*predicates.toTypedArray())
+    }
+}
+
 
 @Service
 class ScheduleService(
@@ -80,37 +112,7 @@ class ScheduleService(
             )
         }
     }
-//
-//    fun getSchedulesByStatus(status: ScheduleStatus?): List<ScheduleDto> {
-//
-//        /**
-//         *
-//         * if status === SCHEDULED_AND_LIVE ? return scheduled and live,
-//         * else return varunna status
-//         *
-//         * in repo find by status should accept array of status like:
-//         *          fun findByStatuses(statuses: List<ScheduleStatus>): List<Schedule>
-//         *
-//         */
-//        val schedules = if (status != null) {
-//            scheduleRepository.findByStatus(status)
-//        } else {
-//            scheduleRepository.findAll()
-//        }
-//
-//        return schedules.map { schedule ->
-//            ScheduleDto(
-//                id = schedule.id,
-//                startDateTime = schedule.startDateTime,
-//                endDateTime = schedule.endDateTime,
-//                createdAt = schedule.createdAt,
-//                updatedAt = schedule.updatedAt,
-//                status = schedule.status,
-//                quizTitle = schedule.quiz.quizName,
-//                quizId = schedule.quiz.quizId!!
-//            )
-//        }
-//    }
+
 fun getSchedulesByStatuses(statuses: List<ScheduleStatus>?): List<ScheduleDto> {
     val schedules = if (!statuses.isNullOrEmpty()) {
         scheduleRepository.findByStatusIn(statuses)
@@ -118,6 +120,7 @@ fun getSchedulesByStatuses(statuses: List<ScheduleStatus>?): List<ScheduleDto> {
     } else {
         scheduleRepository.findAll()
     }
+
 
     return schedules.map { schedule ->
         ScheduleDto(
@@ -159,6 +162,19 @@ fun getSchedulesByStatuses(statuses: List<ScheduleStatus>?): List<ScheduleDto> {
 
     fun getSchedulesByQuizId(quizId: String): List<ScheduleDto>  {
         val schedules = scheduleRepository.findByQuizQuizId(quizId)
+        return schedules.map { schedule -> scheduleToDto(schedule) }
+    }
+
+    fun getAllSchedulesFiltered(
+        sortBy: String?,
+        search: String?,
+        startDate:LocalDateTime?,
+        endDate: LocalDateTime?,
+        status: List<ScheduleStatus>?)
+    : List<ScheduleDto> {
+        val sort = Sort.by(Sort.Direction.ASC, sortBy)
+        val spec = scheduleSpecification(startDate,endDate,status)
+        val schedules = scheduleRepository.findAll(spec, sort)
         return schedules.map { schedule -> scheduleToDto(schedule) }
     }
 
