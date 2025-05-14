@@ -18,6 +18,7 @@ class AdminController(
     private val adminService: AdminService
 ) {
 
+    /**
     @PostMapping("/create")
     fun createQuiz(
         @RequestParam("file") file: MultipartFile,
@@ -82,4 +83,5 @@ class AdminController(
     fun getQuizWithQuestions(@PathVariable quizId: String): QuizWithQuestionsDto {
         return adminService.getQuizWithQuestions(quizId)
     }
+    */
 }
