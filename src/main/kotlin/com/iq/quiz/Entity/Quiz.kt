@@ -19,6 +19,6 @@ data class Quiz(
     val createdAt: LocalDateTime,
 
     @Enumerated(EnumType.STRING)
-    val status: QuizStatus
+    var status: QuizStatus
 )
 

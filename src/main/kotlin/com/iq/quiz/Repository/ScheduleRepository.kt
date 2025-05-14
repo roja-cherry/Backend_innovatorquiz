@@ -18,8 +18,6 @@ interface ScheduleRepository: JpaRepository<Schedule, String>,JpaSpecificationEx
     fun findAllByQuiz(quiz: Quiz): List<Schedule>
     fun findByStatusIn(statuses: List<ScheduleStatus>): List<Schedule>
 
-
-
     @Query(
         ("SELECT COUNT(s) > 0 FROM Schedule s " +
                 "WHERE s.startDateTime < :end " +
@@ -50,7 +48,7 @@ interface ScheduleRepository: JpaRepository<Schedule, String>,JpaSpecificationEx
     @Query("""
     UPDATE Schedule s
     SET s.status = CASE
-        WHEN s.startDateTime <= :now AND s.endDateTime >= :now THEN 'LIVE'
+        WHEN s.startDateTime <= :now AND s.endDateTime >= :now THEN 'ACTIVE'
         WHEN s.endDateTime < :now THEN 'COMPLETED'
         ELSE s.status
     END
