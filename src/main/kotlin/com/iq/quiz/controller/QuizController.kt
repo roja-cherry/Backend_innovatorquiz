@@ -2,7 +2,13 @@ package com.iq.quiz.controller
 
 import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
+import com.iq.quiz.Entity.Quiz
+import com.iq.quiz.Entity.QuizStatus
+import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.service.QuizService
+import com.iq.quiz.service.quizSpecification
+import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,10 +19,16 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @RestController
 @RequestMapping("/api/quiz")
-class QuizController(private val quizService: QuizService) {
+class QuizController
+    (private val quizService: QuizService,
+            private val quizRepository: QuizRepository) {
 
     @PostMapping
     fun createQuiz(
@@ -43,4 +55,31 @@ class QuizController(private val quizService: QuizService) {
     ): QuizWithQuestionsDto {
         return quizService.editQuiz(id, quizName, timer, file)
     }
+
+    @GetMapping("/{quizId}")
+    fun getQuizDto(
+        @PathVariable("quizId") quizId: String
+    ) :ResponseEntity<QuizDTO>{
+        val response = quizService.getQuizDto(quizId)
+        return ResponseEntity.status(HttpStatus.OK).body(response)
+    }
+
+
+    @GetMapping
+    fun getQuizzes(
+        @RequestParam(required = false) search: String?,
+        @RequestParam(required = false) startDate: String?,
+        @RequestParam(required = false) endDate: String?,
+        @RequestParam(required = false) status: QuizStatus?
+    ): ResponseEntity<List<Quiz>> {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val startDateTime = startDate?.let { LocalDate.parse(it, formatter).atStartOfDay() }
+        val endDateTime = endDate?.let { LocalDate.parse(it, formatter).atTime(LocalTime.MAX) }
+
+        val spec = quizSpecification(search, startDateTime, endDateTime, status)
+        val quizzes = quizRepository.findAll(spec)
+        return ResponseEntity.ok(quizzes)
+    }
+
 }
+
