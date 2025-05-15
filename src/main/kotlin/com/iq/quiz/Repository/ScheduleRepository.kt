@@ -46,16 +46,16 @@ interface ScheduleRepository : JpaRepository<Schedule, String>, JpaSpecification
     ): Boolean
 
     @Modifying
-    @Query(value = """
-    UPDATE schedule
-    SET status = CASE
-        WHEN status NOT IN ('COMPLETED', 'CANCELLED') AND :now > end_date_time THEN 'COMPLETED'
-        WHEN status NOT IN ('COMPLETED', 'CANCELLED') AND :now BETWEEN start_date_time AND end_date_time THEN 'ACTIVE'
-        ELSE status
+    @Query(
+        """
+    UPDATE Schedule s
+    SET s.status = CASE
+        WHEN s.status = 'PUBLISHED' AND s.startDateTime <= :now AND s.endDateTime > :now THEN 'ACTIVE'
+        WHEN s.status != 'COMPLETED' AND s.status != 'CANCELLED' AND s.endDateTime <= :now THEN 'COMPLETED'
+        ELSE s.status
     END
-    WHERE status NOT IN ('COMPLETED', 'CANCELLED')
-      AND (:now > end_date_time OR :now BETWEEN start_date_time AND end_date_time)
-    """, nativeQuery = true)
+    WHERE s.status IN ('PUBLISHED', 'ACTIVE')
+    """
+    )
     fun updateScheduleStatuses(@Param("now") now: LocalDateTime): Int
-
 }
