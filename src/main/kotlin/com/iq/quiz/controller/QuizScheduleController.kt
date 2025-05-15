@@ -2,6 +2,7 @@ package com.iq.quiz.controller
 
 import com.iq.quiz.Dto.PublishQuizRequest
 import com.iq.quiz.Dto.ScheduleDto
+import com.iq.quiz.Dto.schedule.ScheduleEditCreateRequest
 import com.iq.quiz.Entity.Schedule
 import com.iq.quiz.service.QuizScheduleService
 import org.springframework.http.ResponseEntity
@@ -29,6 +30,15 @@ class QuizScheduleController(
     @PatchMapping("/{scheduleId}/cancel")
     fun cancelSchedule(@PathVariable scheduleId: String):ResponseEntity<ScheduleDto>{
         val response = scheduleService.cancelSchedule(scheduleId)
+        return ResponseEntity.ok(response)
+    }
+
+    @PatchMapping("/{scheduleId}/reschedule")
+    fun reschedule(
+        @PathVariable scheduleId: String,
+        @RequestBody reschedule:ScheduleEditCreateRequest
+    ):ResponseEntity<ScheduleDto>{
+        val response=scheduleService.reschedule(scheduleId,reschedule)
         return ResponseEntity.ok(response)
     }
 }
