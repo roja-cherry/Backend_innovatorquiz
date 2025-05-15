@@ -19,9 +19,9 @@ class QuizScheduleController(
         return ResponseEntity.ok(schedule)
     }
 
-    @PostMapping("/publish")
-    fun publishQuiz(@RequestBody request:PublishQuizRequest):ResponseEntity<ScheduleDto>{
-     val result=scheduleService.publishQuiz(request)
+    @PostMapping
+    fun publishQuiz(@RequestBody request: PublishQuizRequest): ResponseEntity<ScheduleDto> {
+        val result = scheduleService.publishQuiz(request)
         return ResponseEntity.ok(result)
     }
 }

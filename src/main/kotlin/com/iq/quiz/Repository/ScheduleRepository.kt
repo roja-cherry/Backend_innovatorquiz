@@ -12,9 +12,8 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 
-
 @Repository
-interface ScheduleRepository: JpaRepository<Schedule, String>,JpaSpecificationExecutor<Schedule> {
+interface ScheduleRepository : JpaRepository<Schedule, String>, JpaSpecificationExecutor<Schedule> {
     fun findAllByQuiz(quiz: Quiz): List<Schedule>
     fun findByStatusIn(statuses: List<ScheduleStatus>): List<Schedule>
 
@@ -32,12 +31,14 @@ interface ScheduleRepository: JpaRepository<Schedule, String>,JpaSpecificationEx
 
     fun findByQuizQuizId(quizId: String): List<Schedule>
 
-    @Query("""
+    @Query(
+        """
     SELECT COUNT(s) > 0 FROM Schedule s
     WHERE s.startDateTime < :end
       AND s.endDateTime > :start
       AND s.id <> :excludeId
-""")
+"""
+    )
     fun existsByTimeRangeOverlapExcludesGivenSchedule(
         @Param("start") start: LocalDateTime,
         @Param("end") end: LocalDateTime,
@@ -45,18 +46,16 @@ interface ScheduleRepository: JpaRepository<Schedule, String>,JpaSpecificationEx
     ): Boolean
 
     @Modifying
-    @Query("""
-    UPDATE Schedule s
-    SET s.status = CASE
-        WHEN s.startDateTime <= :now AND s.endDateTime >= :now THEN 'ACTIVE'
-        WHEN s.endDateTime < :now THEN 'COMPLETED'
-        ELSE s.status
+    @Query(value = """
+    UPDATE schedule
+    SET status = CASE
+        WHEN status NOT IN ('COMPLETED', 'CANCELLED') AND :now > end_date_time THEN 'COMPLETED'
+        WHEN status NOT IN ('COMPLETED', 'CANCELLED') AND :now BETWEEN start_date_time AND end_date_time THEN 'ACTIVE'
+        ELSE status
     END
-    WHERE s.status NOT IN ('COMPLETED', 'CANCELLED')
-      AND (
-          (s.startDateTime <= :now AND s.endDateTime >= :now)
-          OR (s.endDateTime < :now)
-      )
-    """)
-    fun updateStatuses(@Param("now") now: LocalDateTime): Int;
+    WHERE status NOT IN ('COMPLETED', 'CANCELLED')
+      AND (:now > end_date_time OR :now BETWEEN start_date_time AND end_date_time)
+    """, nativeQuery = true)
+    fun updateScheduleStatuses(@Param("now") now: LocalDateTime): Int
+
 }
