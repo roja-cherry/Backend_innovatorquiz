@@ -32,7 +32,7 @@ interface QuizRepository : JpaRepository<Quiz, String>, JpaSpecificationExecutor
     SET q.status = CASE
         WHEN EXISTS (
             SELECT 1 FROM Schedule s
-            WHERE s.quiz = q AND s.status = 'ACTIVE'
+            WHERE s.quiz = q AND s.status = 'ACTIVE                                     '
         ) THEN 'ACTIVE'
         WHEN EXISTS (
             SELECT 1 FROM Schedule s
