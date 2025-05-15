@@ -27,15 +27,11 @@ class QuizScheduleController(
         return ResponseEntity.ok(result)
     }
 
-    @GetMapping("/schedules")
-    fun getSchedules(
-        @RequestParam(required = false) status: ScheduleStatus?
-    ): ResponseEntity<List<ScheduleDto>> {
-        val schedules = scheduleService.getAllSchedules(status ?: ScheduleStatus.ACTIVE)
+    @GetMapping
+    fun getAllSchedules(@RequestParam(required = false) status: ScheduleStatus?): ResponseEntity<List<ScheduleDto>> {
+        val schedules = scheduleService.getAllSchedulesFiltered(status ?: ScheduleStatus.ACTIVE)
         return ResponseEntity.ok(schedules)
     }
-
-
 
     @PatchMapping("/{scheduleId}/cancel")
     fun cancelSchedule(@PathVariable scheduleId: String):ResponseEntity<ScheduleDto>{
