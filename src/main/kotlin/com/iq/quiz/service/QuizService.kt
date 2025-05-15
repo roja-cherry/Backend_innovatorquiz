@@ -176,12 +176,16 @@ class QuizService(
             )
         }
 
-        // Delete associated questions first
+        // 1️⃣ delete all schedules that reference this quiz
+        scheduleRepository.deleteAllByQuizQuizId(quizId)
+
+        // 2️⃣ delete all questions
         questionRepository.deleteAllByQuizQuizId(quizId)
 
-        // Delete the quiz
+        // 3️⃣ delete the quiz itself
         quizRepository.deleteById(quizId)
     }
+
 
     fun getAllQuizzesForAdmin(status: QuizStatus?): List<QuizDTO> {
         val quizzes = if (status != null) {
