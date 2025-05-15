@@ -26,13 +26,12 @@ class QuizScheduleService(
             .orElseThrow { RuntimeException("Schedule not found") }
     }
 
-    fun publishQuiz(request: PublishQuizRequest):ScheduleDto{
-        val quiz=quizRepository.findById(request.quizId)
-            .orElseThrow(){
+    fun publishQuiz(request: PublishQuizRequest): ScheduleDto {
+        val quiz = quizRepository.findById(request.quizId)
+            .orElseThrow { RuntimeException("quiz not found") }
+        quiz.status = QuizStatus.PUBLISHED
+        quizRepository.save(quiz)
 
-                RuntimeException("quiz not found")}
-                quiz.status=QuizStatus.PUBLISHED
-                quizRepository.save(quiz)
         val schedule = Schedule(
             quiz = quiz,
             startDateTime = request.quizStartDateTime,
@@ -44,6 +43,18 @@ class QuizScheduleService(
         scheduleRepository.save(saved)
         return scheduleToDto(saved)
     }
+
+    fun getAllSchedules(status: ScheduleStatus? = ScheduleStatus.ACTIVE): List<ScheduleDto> {
+        val schedules = if (status != null) {
+            scheduleRepository.findAllByStatus(status)
+        } else {
+            scheduleRepository.findAll()
+        }
+
+        return schedules.map { scheduleToDto(it) }
+    }
+
+
 
     fun cancelSchedule(id: String):ScheduleDto {
         val existingSchedule = scheduleRepository.findById(id).orElseThrow{ScheduleException("Schedule Not Found with Id ${id}",HttpStatus.NOT_FOUND)}
