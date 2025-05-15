@@ -41,3 +41,12 @@ fun questionToDto(question: Question): QuestionDTO {
         correctAnswer = question.correctAnswer
     )
 }
+fun quizToQuizDto(quiz: Quiz): QuizDTO {
+    return QuizDTO(
+        quizId = quiz.quizId,
+        quizName = quiz.quizName,
+        timer = quiz.timer,
+        createdAt = quiz.createdAt,
+        status = quiz.status
+    )
+}

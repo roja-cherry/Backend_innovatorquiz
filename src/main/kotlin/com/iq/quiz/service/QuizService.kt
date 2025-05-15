@@ -12,6 +12,7 @@ import com.iq.quiz.exception.QuizException
 import com.iq.quiz.exception.QuizNotFoundException
 import com.iq.quiz.mapper.questionToDto
 import com.iq.quiz.mapper.quizToDto
+import com.iq.quiz.mapper.quizToQuizDto
 import jakarta.persistence.criteria.Predicate
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
@@ -171,5 +172,13 @@ class QuizService(
             )
         }
     }
+    //fun for search
+
+    fun searchQuizzes(keyword: String): List<QuizDTO> {
+        val results = quizRepository.searchByKeyword(keyword)
+        return results.map { quizToQuizDto(it) }
+    }
+
+
 
 }
