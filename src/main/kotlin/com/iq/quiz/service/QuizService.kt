@@ -153,4 +153,23 @@ class QuizService(
         // Delete the quiz
         quizRepository.deleteById(quizId)
     }
+
+    fun getAllQuizzesForAdmin(status: QuizStatus?): List<QuizDTO> {
+        val quizzes = if (status != null) {
+            quizRepository.findByStatus(status)
+        } else {
+            quizRepository.findAll()
+        }
+
+        return quizzes.map { quiz ->
+            QuizDTO(
+                quizId = quiz.quizId,
+                quizName = quiz.quizName,
+                timer = quiz.timer,
+                createdAt = quiz.createdAt,
+                status = quiz.status
+            )
+        }
+    }
+
 }

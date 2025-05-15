@@ -1,6 +1,7 @@
 package com.iq.quiz.Repository
 
 import com.iq.quiz.Entity.Quiz
+import com.iq.quiz.Entity.QuizStatus
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
@@ -19,6 +20,8 @@ interface QuizRepository : JpaRepository<Quiz, String>, JpaSpecificationExecutor
     fun deleteByQuizId(quizId: String)
 
     fun existsByQuizName(quizName: String): Boolean
+
+    fun findByStatus(status: QuizStatus): MutableList<Quiz>
 
 
 }
