@@ -40,4 +40,16 @@ class QuizScheduleService(
         scheduleRepository.save(saved)
         return scheduleToDto(saved)
     }
+
+    fun getAllSchedules(status: ScheduleStatus? = ScheduleStatus.ACTIVE): List<ScheduleDto> {
+        val schedules = if (status != null) {
+            scheduleRepository.findAllByStatus(status)
+        } else {
+            scheduleRepository.findAll()
+        }
+
+        return schedules.map { scheduleToDto(it) }
+    }
+
+
 }

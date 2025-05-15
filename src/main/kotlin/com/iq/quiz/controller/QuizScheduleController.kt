@@ -3,6 +3,7 @@ package com.iq.quiz.controller
 import com.iq.quiz.Dto.PublishQuizRequest
 import com.iq.quiz.Dto.ScheduleDto
 import com.iq.quiz.Entity.Schedule
+import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.service.QuizScheduleService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -24,4 +25,13 @@ class QuizScheduleController(
      val result=scheduleService.publishQuiz(request)
         return ResponseEntity.ok(result)
     }
+
+    @GetMapping("/schedules")
+    fun getSchedules(
+        @RequestParam(required = false) status: ScheduleStatus?
+    ): ResponseEntity<List<ScheduleDto>> {
+        val schedules = scheduleService.getAllSchedules(status ?: ScheduleStatus.ACTIVE)
+        return ResponseEntity.ok(schedules)
+    }
+
 }
