@@ -12,11 +12,46 @@ import com.iq.quiz.exception.QuizException
 import com.iq.quiz.exception.QuizNotFoundException
 import com.iq.quiz.mapper.questionToDto
 import com.iq.quiz.mapper.quizToDto
+import jakarta.persistence.criteria.Predicate
+import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
+
+fun quizSpecification(
+    search: String?,
+    startDate: LocalDateTime?,
+    endDate: LocalDateTime?,
+    status: QuizStatus?
+): Specification<Quiz> {
+    return Specification { root, _, cb ->
+        val predicates = mutableListOf<Predicate>()
+
+        // 📝 Filter by quizName
+        search?.let {
+            predicates.add(cb.like(cb.lower(root.get("quizName")), "%${it.lowercase()}%"))
+        }
+
+        startDate?.let {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), it))
+        }
+        endDate?.let {
+            predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), it))
+        }
+
+        // 🚦 Filter by status
+        status?.let {
+            predicates.add(cb.equal(root.get<QuizStatus>("status"), it))
+        }
+
+        cb.and(*predicates.toTypedArray())
+    }
+}
+
+
 
 @Service
 class QuizService(
@@ -52,6 +87,26 @@ class QuizService(
 
         return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
     }
+
+    fun getQuizDto(quizId: String): QuizDTO {
+        val quiz = quizRepository.findByQuizId(quizId)
+            ?: throw QuizNotFoundException("Quiz Not Found")
+        return quizToDto(quiz)
+    }
+
+    fun getAllQuizzesFiltered(
+        sortBy: String?,
+        search: String?,
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?,
+        status: QuizStatus?
+    ): List<QuizDTO> {
+        val sort = Sort.by(Sort.Direction.ASC, sortBy ?: "createdAt")
+        val spec = quizSpecification(search, startDate, endDate, status)
+        val quizzes = quizRepository.findAll(spec, sort)
+        return quizzes.map { quiz -> quizToDto(quiz) }
+    }
+
 
     @Transactional
     fun editQuiz(id: String, quizName: String?, timer: Long?, file: MultipartFile?): QuizWithQuestionsDto {

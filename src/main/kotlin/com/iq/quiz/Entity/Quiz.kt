@@ -20,5 +20,9 @@ data class Quiz(
 
     @Enumerated(EnumType.STRING)
     var status: QuizStatus
-)
+){
+    fun getStatusText(): String {
+        return status.text
+    }
+}
 

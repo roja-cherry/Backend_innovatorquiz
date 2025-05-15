@@ -2,6 +2,7 @@ package com.iq.quiz.controller
 
 import com.iq.quiz.Dto.PublishQuizRequest
 import com.iq.quiz.Dto.ScheduleDto
+import com.iq.quiz.Dto.schedule.ScheduleEditCreateRequest
 import com.iq.quiz.Entity.Schedule
 import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.service.QuizScheduleService
@@ -20,9 +21,9 @@ class QuizScheduleController(
         return ResponseEntity.ok(schedule)
     }
 
-    @PostMapping("/publish")
-    fun publishQuiz(@RequestBody request:PublishQuizRequest):ResponseEntity<ScheduleDto>{
-     val result=scheduleService.publishQuiz(request)
+    @PostMapping
+    fun publishQuiz(@RequestBody request: PublishQuizRequest): ResponseEntity<ScheduleDto> {
+        val result = scheduleService.publishQuiz(request)
         return ResponseEntity.ok(result)
     }
 
@@ -34,4 +35,20 @@ class QuizScheduleController(
         return ResponseEntity.ok(schedules)
     }
 
+
+
+    @PatchMapping("/{scheduleId}/cancel")
+    fun cancelSchedule(@PathVariable scheduleId: String):ResponseEntity<ScheduleDto>{
+        val response = scheduleService.cancelSchedule(scheduleId)
+        return ResponseEntity.ok(response)
+    }
+
+    @PatchMapping("/{scheduleId}/reschedule")
+    fun reschedule(
+        @PathVariable scheduleId: String,
+        @RequestBody reschedule:ScheduleEditCreateRequest
+    ):ResponseEntity<ScheduleDto>{
+        val response=scheduleService.reschedule(scheduleId,reschedule)
+        return ResponseEntity.ok(response)
+    }
 }
