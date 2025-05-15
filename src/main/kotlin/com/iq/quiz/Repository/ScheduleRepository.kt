@@ -67,4 +67,9 @@ interface ScheduleRepository : JpaRepository<Schedule, String>, JpaSpecification
     fun updateScheduleStatuses(@Param("now") now: LocalDateTime): Int
 
     fun findAllByStatus(status: ScheduleStatus): List<Schedule>
+
+    fun deleteAllByQuizQuizId(quizId: String)
+
+
+
 }
