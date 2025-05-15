@@ -10,16 +10,33 @@ import com.iq.quiz.Repository.QuizRepository
 import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.exception.ScheduleException
 import com.iq.quiz.mapper.scheduleToDto
+import jakarta.persistence.criteria.Predicate
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+
 
 @Service
 class QuizScheduleService(
     private val scheduleRepository: ScheduleRepository,
     private val quizRepository: QuizRepository
 ) {
+
+    fun scheduleSpecification(
+        status: ScheduleStatus? = ScheduleStatus.ACTIVE
+    ): Specification<Schedule> {
+        return Specification { root, _, cb ->
+            val predicates = mutableListOf<Predicate>()
+
+            status?.let {
+                predicates.add(cb.equal(root.get<ScheduleStatus>("status"), it))
+            }
+
+            cb.and(*predicates.toTypedArray())
+        }
+    }
 
     fun getScheduleById(scheduleId: String): Schedule {
         return scheduleRepository.findById(scheduleId)
@@ -43,6 +60,13 @@ class QuizScheduleService(
         scheduleRepository.save(saved)
         return scheduleToDto(saved)
     }
+
+    fun getAllSchedulesFiltered(status: ScheduleStatus? = ScheduleStatus.ACTIVE): List<ScheduleDto> {
+        val spec = scheduleSpecification(status)
+        val schedules = scheduleRepository.findAll(spec)
+        return schedules.map { scheduleToDto(it) }
+    }
+
 
     fun cancelSchedule(id: String):ScheduleDto {
         val existingSchedule = scheduleRepository.findById(id).orElseThrow{ScheduleException("Schedule Not Found with Id ${id}",HttpStatus.NOT_FOUND)}

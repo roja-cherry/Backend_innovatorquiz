@@ -59,8 +59,8 @@ class QuizController
     @GetMapping("/{quizId}")
     fun getQuizDto(
         @PathVariable("quizId") quizId: String
-    ) :ResponseEntity<QuizDTO>{
-        val response = quizService.getQuizDto(quizId)
+    ) :ResponseEntity<QuizWithQuestionsDto>{
+        val response = quizService.getQuizWithQuestions(quizId)
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 
@@ -79,6 +79,12 @@ class QuizController
         val spec = quizSpecification(search, startDateTime, endDateTime, status)
         val quizzes = quizRepository.findAll(spec)
         return ResponseEntity.ok(quizzes)
+    }
+
+    @GetMapping("/search")
+    fun searchQuizzes(@RequestParam keyword: String): ResponseEntity<List<QuizDTO>> {
+        val results = quizService.searchQuizzes(keyword)
+        return ResponseEntity.ok(results)
     }
 
 }

@@ -1,5 +1,6 @@
 package com.iq.quiz.service
 
+import com.iq.quiz.Dto.QuestionDTO
 import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
 import com.iq.quiz.Entity.Quiz
@@ -12,6 +13,7 @@ import com.iq.quiz.exception.QuizException
 import com.iq.quiz.exception.QuizNotFoundException
 import com.iq.quiz.mapper.questionToDto
 import com.iq.quiz.mapper.quizToDto
+import com.iq.quiz.mapper.quizToQuizDto
 import jakarta.persistence.criteria.Predicate
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
@@ -88,11 +90,38 @@ class QuizService(
         return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
     }
 
-    fun getQuizDto(quizId: String): QuizDTO {
+    fun getQuizWithQuestions(quizId: String): QuizWithQuestionsDto {
         val quiz = quizRepository.findByQuizId(quizId)
             ?: throw QuizNotFoundException("Quiz Not Found")
-        return quizToDto(quiz)
+
+        val questions = questionRepository.findByQuizQuizId(quizId) // ✅ Corrected repository call
+
+        val quizDto = QuizDTO(
+            quizId = quiz.quizId,
+            quizName = quiz.quizName,
+            timer = quiz.timer,
+            createdAt = quiz.createdAt,
+            status = quiz.status
+        )
+
+        val questionDtos = questions.map { question ->
+            QuestionDTO(
+                questionId = question.questionId,
+                question = question.question,
+                option1 = question.option1,
+                option2 = question.option2,
+                option3 = question.option3,
+                option4 = question.option4,
+                correctAnswer = question.correctAnswer
+            )
+        }
+
+        return QuizWithQuestionsDto(
+            quiz = quizDto,
+            questions = questionDtos
+        )
     }
+
 
     fun getAllQuizzesFiltered(
         sortBy: String?,
@@ -171,5 +200,13 @@ class QuizService(
             )
         }
     }
+    //fun for search
+
+    fun searchQuizzes(keyword: String): List<QuizDTO> {
+        val results = quizRepository.searchByKeyword(keyword)
+        return results.map { quizToQuizDto(it) }
+    }
+
+
 
 }
