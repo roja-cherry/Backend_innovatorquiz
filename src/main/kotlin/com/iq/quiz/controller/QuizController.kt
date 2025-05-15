@@ -81,5 +81,11 @@ class QuizController
         return ResponseEntity.ok(quizzes)
     }
 
+    @GetMapping("/search")
+    fun searchQuizzes(@RequestParam keyword: String): ResponseEntity<List<QuizDTO>> {
+        val results = quizService.searchQuizzes(keyword)
+        return ResponseEntity.ok(results)
+    }
+
 }
 
