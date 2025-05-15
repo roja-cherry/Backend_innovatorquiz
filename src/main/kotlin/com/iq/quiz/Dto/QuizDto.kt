@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 data class QuizDTO(
     val quizId: String?,
     val quizName: String,
-    val timer: Int,
+    val timer: Long,
     val createdAt: LocalDateTime? = null,
     val status: QuizStatus
 ) {

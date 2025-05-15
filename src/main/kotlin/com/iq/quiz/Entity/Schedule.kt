@@ -22,7 +22,7 @@ data class Schedule(
     @Enumerated(EnumType.STRING)
     var status: ScheduleStatus,
 
-//    @ManyToOne
-//    @JoinColumn(name = "quiz_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "quiz_id", nullable = false)
     val quiz : Quiz,
 )
