@@ -24,4 +24,11 @@ class QuizScheduleController(
      val result=scheduleService.publishQuiz(request)
         return ResponseEntity.ok(result)
     }
+
+
+    @PatchMapping("/{scheduleId}/cancel")
+    fun cancelSchedule(@PathVariable scheduleId: String):ResponseEntity<ScheduleDto>{
+        val response = scheduleService.cancelSchedule(scheduleId)
+        return ResponseEntity.ok(response)
+    }
 }
