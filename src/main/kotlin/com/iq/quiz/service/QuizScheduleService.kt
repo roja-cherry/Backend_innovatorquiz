@@ -44,6 +44,18 @@ class QuizScheduleService(
         return scheduleToDto(saved)
     }
 
+    fun getAllSchedules(status: ScheduleStatus? = ScheduleStatus.ACTIVE): List<ScheduleDto> {
+        val schedules = if (status != null) {
+            scheduleRepository.findAllByStatus(status)
+        } else {
+            scheduleRepository.findAll()
+        }
+
+        return schedules.map { scheduleToDto(it) }
+    }
+
+
+
     fun cancelSchedule(id: String):ScheduleDto {
         val existingSchedule = scheduleRepository.findById(id).orElseThrow{ScheduleException("Schedule Not Found with Id ${id}",HttpStatus.NOT_FOUND)}
         if(existingSchedule.status == ScheduleStatus.PUBLISHED || existingSchedule.status ==ScheduleStatus.ACTIVE) {

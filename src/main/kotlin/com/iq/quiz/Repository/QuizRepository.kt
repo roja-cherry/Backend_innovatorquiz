@@ -26,36 +26,23 @@ interface QuizRepository : JpaRepository<Quiz, String>, JpaSpecificationExecutor
     fun findByStatus(status: QuizStatus): MutableList<Quiz>
 
     @Modifying(clearAutomatically = true)
-    @Query("""
+    @Query(
+        """
     UPDATE Quiz q
     SET q.status = CASE
         WHEN EXISTS (
             SELECT 1 FROM Schedule s
-            WHERE s.quiz = q
-              AND s.status NOT IN ('COMPLETED', 'CANCELLED')
-              AND s.startDateTime <= :now AND s.endDateTime >= :now
+            WHERE s.quiz = q AND s.status = 'ACTIVE                                     '
         ) THEN 'ACTIVE'
         WHEN EXISTS (
             SELECT 1 FROM Schedule s
-            WHERE s.quiz = q
-              AND s.status NOT IN ('COMPLETED', 'CANCELLED')
-              AND s.endDateTime < :now
+            WHERE s.quiz = q AND s.status = 'COMPLETED'
         ) THEN 'COMPLETED'
         ELSE q.status
     END
-    WHERE q.status NOT IN ('COMPLETED', 'CANCELLED')
-      AND (
-          EXISTS (
-              SELECT 1 FROM Schedule s
-              WHERE s.quiz = q
-                AND s.status NOT IN ('COMPLETED', 'CANCELLED')
-                AND (
-                    (s.startDateTime <= :now AND s.endDateTime >= :now)
-                    OR (s.endDateTime < :now)
-                )
-          )
-      )
-""")
+    WHERE q.status IN ('PUBLISHED', 'ACTIVE')
+    """
+    )
     fun updateQuizStatuses(@Param("now") now: LocalDateTime): Int
 
 }

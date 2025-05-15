@@ -18,8 +18,8 @@ class StatusUpdateScheduler (
     fun runStatusUpdate() {
         println("Running in scheduler")
         val now = LocalDateTime.now()
-        val updatedScheduleCount=scheduleRepository.updateScheduleStatuses(now)
-//        val updatedQuizCount =quizRepository.updateQuizStatuses(now)
-        println("Updated $updatedScheduleCount schedules status & quiz status")
+        val updatedScheduleCount = scheduleRepository.updateScheduleStatuses(now)
+        val updatedQuizCount =quizRepository.updateQuizStatuses(now)
+        println("Updated $updatedScheduleCount schedules status & $updatedQuizCount quiz status")
     }
 }
