@@ -24,5 +24,6 @@ data class Quiz(
     fun getStatusText(): String {
         return status.text
     }
+
 }
 

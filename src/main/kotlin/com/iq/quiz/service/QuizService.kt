@@ -1,5 +1,6 @@
 package com.iq.quiz.service
 
+import com.iq.quiz.Dto.QuestionDTO
 import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
 import com.iq.quiz.Entity.Quiz
@@ -89,11 +90,38 @@ class QuizService(
         return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
     }
 
-    fun getQuizDto(quizId: String): QuizDTO {
+    fun getQuizWithQuestions(quizId: String): QuizWithQuestionsDto {
         val quiz = quizRepository.findByQuizId(quizId)
             ?: throw QuizNotFoundException("Quiz Not Found")
-        return quizToDto(quiz)
+
+        val questions = questionRepository.findByQuizQuizId(quizId) // ✅ Corrected repository call
+
+        val quizDto = QuizDTO(
+            quizId = quiz.quizId,
+            quizName = quiz.quizName,
+            timer = quiz.timer,
+            createdAt = quiz.createdAt,
+            status = quiz.status
+        )
+
+        val questionDtos = questions.map { question ->
+            QuestionDTO(
+                questionId = question.questionId,
+                question = question.question,
+                option1 = question.option1,
+                option2 = question.option2,
+                option3 = question.option3,
+                option4 = question.option4,
+                correctAnswer = question.correctAnswer
+            )
+        }
+
+        return QuizWithQuestionsDto(
+            quiz = quizDto,
+            questions = questionDtos
+        )
     }
+
 
     fun getAllQuizzesFiltered(
         sortBy: String?,

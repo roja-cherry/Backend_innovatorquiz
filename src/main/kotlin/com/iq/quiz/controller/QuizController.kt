@@ -59,8 +59,8 @@ class QuizController
     @GetMapping("/{quizId}")
     fun getQuizDto(
         @PathVariable("quizId") quizId: String
-    ) :ResponseEntity<QuizDTO>{
-        val response = quizService.getQuizDto(quizId)
+    ) :ResponseEntity<QuizWithQuestionsDto>{
+        val response = quizService.getQuizWithQuestions(quizId)
         return ResponseEntity.status(HttpStatus.OK).body(response)
     }
 
