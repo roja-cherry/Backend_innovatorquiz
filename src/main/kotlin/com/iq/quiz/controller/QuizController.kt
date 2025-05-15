@@ -2,6 +2,7 @@ package com.iq.quiz.controller
 
 import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
+import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.service.QuizService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -42,5 +43,12 @@ class QuizController(private val quizService: QuizService) {
         @RequestParam file: MultipartFile?
     ): QuizWithQuestionsDto {
         return quizService.editQuiz(id, quizName, timer, file)
+    }
+
+    @GetMapping("/quizzes")
+    fun getAllQuizzesForAdmin(
+        @RequestParam(required = false) status: QuizStatus?
+    ): List<QuizDTO> {
+        return quizService.getAllQuizzesForAdmin(status)
     }
 }
