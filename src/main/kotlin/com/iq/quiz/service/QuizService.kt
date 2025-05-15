@@ -176,13 +176,9 @@ class QuizService(
             )
         }
 
-        // 1️⃣ delete all schedules that reference this quiz
+
         scheduleRepository.deleteAllByQuizQuizId(quizId)
-
-        // 2️⃣ delete all questions
         questionRepository.deleteAllByQuizQuizId(quizId)
-
-        // 3️⃣ delete the quiz itself
         quizRepository.deleteById(quizId)
     }
 
