@@ -1,5 +1,8 @@
 package com.iq.quiz.exception
 
+import com.iq.quiz.service.QuizScheduleService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -23,6 +26,7 @@ fun getDuplicateFieldMessage(msg: String): String {
 @RestControllerAdvice
 class GlobalExceptionHandler {
 
+    private val logger: Logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
     @ExceptionHandler(FileFormatException::class)
     fun handleFileFormatException(ex : FileFormatException) : ResponseEntity<ErrorResponse>{
@@ -31,6 +35,7 @@ class GlobalExceptionHandler {
             status = HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(),
             message = ex.message
         )
+        logger.error(ex.stackTrace.toString())
         return ResponseEntity(error, HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     }
 
@@ -41,6 +46,7 @@ class GlobalExceptionHandler {
                 status = HttpStatus.NOT_FOUND.value(),
                 message = ex.message,
             )
+            logger.error(ex.stackTrace.toString())
             return ResponseEntity(error, HttpStatus.NOT_FOUND)
     }
 
@@ -51,6 +57,7 @@ class GlobalExceptionHandler {
             status = ex.status.value(),
             message = ex.message
         )
+        logger.error(ex.stackTrace.toString())
         return ResponseEntity.status(ex.status).body(error)
     }
 
@@ -61,6 +68,7 @@ class GlobalExceptionHandler {
             message = getDuplicateFieldMessage(ex.localizedMessage),
             status = HttpStatus.BAD_REQUEST.value()
         )
+        logger.error(ex.stackTrace.toString())
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)
     }
 
@@ -71,8 +79,19 @@ class GlobalExceptionHandler {
             message = ex.message,
             status = HttpStatus.BAD_REQUEST.value()
         )
-        ex.printStackTrace()
+        logger.error(ex.stackTrace.toString())
         return ResponseEntity.status(ex.status).body(response)
+    }
+
+    @ExceptionHandler(RuntimeException::class)
+    fun handleRuntimeException(ex: RuntimeException): ResponseEntity<ErrorResponse> {
+        val response = ErrorResponse(
+            timestamp = LocalDateTime.now(),
+            message = ex.message,
+            status = HttpStatus.INTERNAL_SERVER_ERROR.value()
+        )
+        logger.error(ex.stackTrace.toString())
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response)
     }
 
 }
