@@ -5,8 +5,11 @@ import com.iq.quiz.Dto.QuizWithQuestionsDto
 import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.QuizStatus
 import com.iq.quiz.Repository.QuizRepository
+import com.iq.quiz.service.QuizScheduleService
 import com.iq.quiz.service.QuizService
 import com.iq.quiz.service.quizSpecification
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -26,9 +29,12 @@ import java.time.format.DateTimeFormatter
 
 @RestController
 @RequestMapping("/api/quiz")
-class QuizController
-    (private val quizService: QuizService,
-            private val quizRepository: QuizRepository) {
+class QuizController(
+    private val quizService: QuizService,
+    private val quizRepository: QuizRepository
+) {
+
+    private val logger: Logger = LoggerFactory.getLogger(QuizController::class.java)
 
     @PostMapping
     fun createQuiz(
@@ -37,6 +43,7 @@ class QuizController
         @RequestParam file: MultipartFile
     ): ResponseEntity<QuizWithQuestionsDto> {
         val response = quizService.createNewQuiz(quizName, timer, file)
+        logger.info("Created quiz: $response")
         return ResponseEntity.status(201).body(response)
     }
 
@@ -52,8 +59,10 @@ class QuizController
         @RequestParam quizName: String?,
         @RequestParam timer: Long?,
         @RequestParam file: MultipartFile?
-    ): QuizWithQuestionsDto {
-        return quizService.editQuiz(id, quizName, timer, file)
+    ): ResponseEntity<QuizWithQuestionsDto> {
+        val response = quizService.editQuiz(id, quizName, timer, file)
+        logger.info("Quiz edited with id $id: $response")
+        return ResponseEntity.ok(response)
     }
 
     @GetMapping("/{quizId}")
