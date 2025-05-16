@@ -15,6 +15,8 @@ import com.iq.quiz.mapper.questionToDto
 import com.iq.quiz.mapper.quizToDto
 import com.iq.quiz.mapper.quizToQuizDto
 import jakarta.persistence.criteria.Predicate
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus
@@ -62,7 +64,7 @@ class QuizService(
     private val questionRepository: QuestionRepository,
     private val excelService: ExcelService
 ) {
-
+    private val logger: Logger = LoggerFactory.getLogger(QuizScheduleService::class.java)
     @Transactional
     fun createNewQuiz(quizName: String, timer: Long, file: MultipartFile): QuizWithQuestionsDto {
         if (file.isEmpty) {

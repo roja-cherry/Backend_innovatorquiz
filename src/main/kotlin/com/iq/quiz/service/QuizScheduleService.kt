@@ -12,6 +12,8 @@ import com.iq.quiz.exception.ScheduleException
 import com.iq.quiz.mapper.scheduleToDto
 import jakarta.persistence.criteria.Predicate
 import jakarta.transaction.Transactional
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -24,6 +26,7 @@ class QuizScheduleService(
     private val scheduleRepository: ScheduleRepository,
     private val quizRepository: QuizRepository
 ) {
+    private val logger: Logger = LoggerFactory.getLogger(QuizScheduleService::class.java)
 
     fun scheduleSpecification(
         status: ScheduleStatus? = ScheduleStatus.ACTIVE
