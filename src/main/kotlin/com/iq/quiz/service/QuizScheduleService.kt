@@ -31,20 +31,23 @@ class QuizScheduleService(
     fun scheduleSpecification(
         status: ScheduleStatus? = ScheduleStatus.ACTIVE
     ): Specification<Schedule> {
+        logger.debug("Building schedule specification with status: $status")
         return Specification { root, _, cb ->
             val predicates = mutableListOf<Predicate>()
-
             status?.let {
                 predicates.add(cb.equal(root.get<ScheduleStatus>("status"), it))
             }
-
             cb.and(*predicates.toTypedArray())
         }
     }
 
     fun getScheduleById(scheduleId: String): Schedule {
+        logger.info("Fetching schedule with ID: $scheduleId")
         return scheduleRepository.findById(scheduleId)
-            .orElseThrow { RuntimeException("Schedule not found") }
+            .orElseThrow {
+                logger.warn("Schedule not found with ID: $scheduleId")
+                RuntimeException("Schedule not found")
+            }
     }
 
     fun publishQuiz(request: PublishQuizRequest): ScheduleDto {
@@ -66,6 +69,7 @@ class QuizScheduleService(
     }
 
     fun getAllSchedulesFiltered(status: ScheduleStatus?): List<ScheduleDto> {
+        logger.info("Retrieving all schedules with status: $status")
         val spec = scheduleSpecification(status)
         val schedules = scheduleRepository.findAll(spec)
         return schedules.map { scheduleToDto(it) }
@@ -73,44 +77,59 @@ class QuizScheduleService(
 
     @Transactional
     fun cancelSchedule(id: String): ScheduleDto {
+        logger.info("Cancelling schedule with ID: $id")
         val existingSchedule = scheduleRepository.findById(id)
-            .orElseThrow { ScheduleException("Schedule Not Found with Id ${id}", HttpStatus.NOT_FOUND) }
+            .orElseThrow {
+                logger.warn("Schedule not found for cancellation with ID: $id")
+                ScheduleException("Schedule Not Found with Id $id", HttpStatus.NOT_FOUND)
+            }
+
         if (existingSchedule.status == ScheduleStatus.PUBLISHED || existingSchedule.status == ScheduleStatus.ACTIVE) {
             existingSchedule.status = ScheduleStatus.CANCELLED
             scheduleRepository.save(existingSchedule)
+            logger.info("Schedule with ID: $id marked as CANCELLED")
+
             val existingQuiz = quizRepository.findByQuizId(existingSchedule.quiz.quizId.toString())
             if (existingQuiz != null) {
                 existingQuiz.status = QuizStatus.CREATED
                 quizRepository.save(existingQuiz)
+                logger.info("Quiz with ID: ${existingQuiz.quizId} marked as CREATED due to schedule cancellation")
             }
         } else {
+            logger.warn("Attempt to cancel schedule with invalid status: ${existingSchedule.status}")
             throw ScheduleException("Only Published or Active Schedules can be cancelled", HttpStatus.FORBIDDEN)
         }
-        return scheduleToDto(existingSchedule)
 
+        return scheduleToDto(existingSchedule)
     }
 
     @Transactional
     fun reschedule(scheduleId: String, reschedule: ScheduleEditCreateRequest): ScheduleDto {
+        logger.info("Rescheduling schedule with ID: $scheduleId")
         val existingSchedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow { ScheduleException("Schedule not found with Id ${scheduleId}", HttpStatus.NOT_FOUND) }
+            .orElseThrow {
+                logger.warn("Schedule not found for rescheduling with ID: $scheduleId")
+                ScheduleException("Schedule not found with Id $scheduleId", HttpStatus.NOT_FOUND)
+            }
+
         if (existingSchedule.status == ScheduleStatus.PUBLISHED || existingSchedule.status == ScheduleStatus.CANCELLED) {
             existingSchedule.startDateTime = reschedule.startDateTime
             existingSchedule.endDateTime = reschedule.endDateTime
             existingSchedule.status = ScheduleStatus.PUBLISHED
             scheduleRepository.save(existingSchedule)
+            logger.info("Schedule with ID: $scheduleId rescheduled successfully")
+
             val existingQuiz = quizRepository.findByQuizId(existingSchedule.quiz.quizId.toString())
             if (existingQuiz != null) {
                 existingQuiz.status = QuizStatus.PUBLISHED
                 quizRepository.save(existingQuiz)
+                logger.info("Quiz with ID: ${existingQuiz.quizId} marked as PUBLISHED due to reschedule")
             }
         } else {
-            throw ScheduleException(
-                "Only Published and Cancelled Schedules are allowed to Reschedule",
-                HttpStatus.FORBIDDEN
-            )
+            logger.warn("Attempt to reschedule a schedule with invalid status: ${existingSchedule.status}")
+            throw ScheduleException("Only Published and Cancelled Schedules are allowed to Reschedule", HttpStatus.FORBIDDEN)
         }
-        return scheduleToDto(existingSchedule)
 
+        return scheduleToDto(existingSchedule)
     }
 }
