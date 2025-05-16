@@ -64,7 +64,9 @@ class QuizService(
     private val questionRepository: QuestionRepository,
     private val excelService: ExcelService
 ) {
-    private val logger: Logger = LoggerFactory.getLogger(QuizScheduleService::class.java)
+
+    private val logger: Logger = LoggerFactory.getLogger(QuizService::class.java)
+
     @Transactional
     fun createNewQuiz(quizName: String, timer: Long, file: MultipartFile): QuizWithQuestionsDto {
         if (file.isEmpty) {
@@ -88,6 +90,9 @@ class QuizService(
 
         val quizDto = quizToDto(savedQuiz)
         val questionDTOs = questions.map { questionToDto(it) }
+
+        logger.info("New quiz created:  $savedQuiz")
+        logger.info("Questions created: $questions")
 
         return QuizWithQuestionsDto(quiz = quizDto, questions = questionDTOs)
     }
@@ -158,6 +163,8 @@ class QuizService(
             questionRepository.saveAll(newQuestions)
         }
         quizRepository.save(updatedQuiz)
+
+        logger.info("Edit quiz with id $id: fields => file? $file, quizName? $quizName, timer? $timer")
 
         val questions = questionRepository.findByQuizQuizId(id).map { questionToDto(it) }
         return QuizWithQuestionsDto(
