@@ -22,7 +22,6 @@ import java.time.LocalDateTime
 
 
 @Repository
-
 interface ScheduleRepository : JpaRepository<Schedule, String>, JpaSpecificationExecutor<Schedule> {
 
     fun findAllByQuiz(quiz: Quiz): List<Schedule>
@@ -30,79 +29,46 @@ interface ScheduleRepository : JpaRepository<Schedule, String>, JpaSpecification
     fun findByStatusIn(statuses: List<ScheduleStatus>): List<Schedule>
 
     @Query(
-
-        ("SELECT COUNT(s) > 0 FROM Schedule s " +
-
-                "WHERE s.startDateTime < :end " +
-
-                "AND s.endDateTime > :start")
-
-    )
-
-    fun existsByTimeRangeOverlap(
-
-        @Param("start") start: LocalDateTime?,
-
-        @Param("end") end: LocalDateTime?
-
-    ): Boolean
+        """
+     SELECT COUNT(s) > 0 FROM Schedule s 
+                WHERE s.startDateTime < :end 
+                AND s.endDateTime > :start
+    """)
+    fun existsByTimeRangeOverlap(@Param("start") start: LocalDateTime?, @Param("end") end: LocalDateTime?): Boolean
 
     fun existsByQuizQuizIdAndStatusIn(quizId: String, statuses: Collection<ScheduleStatus>): Boolean
 
     fun findByQuizQuizId(quizId: String): List<Schedule>
 
     @Query(
-
         """
-
     SELECT COUNT(s) > 0 FROM Schedule s
-
     WHERE s.startDateTime < :end
-
       AND s.endDateTime > :start
-
       AND s.id <> :excludeId
-
-"""
-
-    )
-
+    """)
     fun existsByTimeRangeOverlapExcludesGivenSchedule(
-
         @Param("start") start: LocalDateTime,
-
         @Param("end") end: LocalDateTime,
-
         @Param("excludeId") excludeId: String
-
     ): Boolean
 
     @Modifying
-
     @Query(
-
         """
-
     UPDATE Schedule s
-
     SET s.status = CASE
-
         WHEN s.status = 'PUBLISHED' AND s.startDateTime <= :now AND s.endDateTime > :now THEN 'ACTIVE'
-
-        WHEN s.status != 'COMPLETED' AND s.status != 'CANCELLED' AND s.endDateTime <= :now THEN 'COMPLETED'
-
+        WHEN s.status != 'COMPLETED' AND s.status != 'CANCELLED' AND s.endDateTime < :now THEN 'COMPLETED'
         ELSE s.status
-
     END
-
     WHERE s.status IN ('PUBLISHED', 'ACTIVE')
-
-    """
-
-    )
-
+    """)
     fun updateScheduleStatuses(@Param("now") now: LocalDateTime): Int
+
     fun findAllByStatus(status: ScheduleStatus): List<Schedule>
+
+    fun deleteAllByQuizQuizId(quizId: String)
 
 
 

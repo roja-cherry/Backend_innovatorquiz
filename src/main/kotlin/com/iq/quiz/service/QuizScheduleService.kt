@@ -62,7 +62,7 @@ class QuizScheduleService(
         return scheduleToDto(saved)
     }
 
-    fun getAllSchedulesFiltered(status: ScheduleStatus? = ScheduleStatus.ACTIVE): List<ScheduleDto> {
+    fun getAllSchedulesFiltered(status: ScheduleStatus?): List<ScheduleDto> {
         val spec = scheduleSpecification(status)
         val schedules = scheduleRepository.findAll(spec)
         return schedules.map { scheduleToDto(it) }

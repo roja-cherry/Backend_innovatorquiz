@@ -29,7 +29,7 @@ class QuizScheduleController(
 
     @GetMapping
     fun getAllSchedules(@RequestParam(required = false) status: ScheduleStatus?): ResponseEntity<List<ScheduleDto>> {
-        val schedules = scheduleService.getAllSchedulesFiltered(status ?: ScheduleStatus.ACTIVE)
+        val schedules = scheduleService.getAllSchedulesFiltered(status)
         return ResponseEntity.ok(schedules)
     }
 
