@@ -69,15 +69,15 @@ class QuizController
     fun getQuizzes(
         @RequestParam(required = false) search: String?,
         @RequestParam(required = false) startDate: String?,
+        @RequestParam(required = false) sortBy: String?,
         @RequestParam(required = false) endDate: String?,
         @RequestParam(required = false) status: QuizStatus?
-    ): ResponseEntity<List<Quiz>> {
+    ): ResponseEntity<List<QuizDTO>> {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val startDateTime = startDate?.let { LocalDate.parse(it, formatter).atStartOfDay() }
         val endDateTime = endDate?.let { LocalDate.parse(it, formatter).atTime(LocalTime.MAX) }
 
-        val spec = quizSpecification(search, startDateTime, endDateTime, status)
-        val quizzes = quizRepository.findAll(spec)
+        val quizzes = quizService.getAllQuizzesFiltered(sortBy, search, startDateTime, endDateTime, status)
         return ResponseEntity.ok(quizzes)
     }
 

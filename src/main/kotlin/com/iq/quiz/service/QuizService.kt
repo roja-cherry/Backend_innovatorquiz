@@ -33,24 +33,20 @@ fun quizSpecification(
 ): Specification<Quiz> {
     return Specification { root, _, cb ->
         val predicates = mutableListOf<Predicate>()
-
-        // 📝 Filter by quizName
+        //Filter by quizName
         search?.let {
             predicates.add(cb.like(cb.lower(root.get("quizName")), "%${it.lowercase()}%"))
         }
-
         startDate?.let {
             predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), it))
         }
         endDate?.let {
             predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), it))
         }
-
-        // 🚦 Filter by status
+        // Filter by status
         status?.let {
             predicates.add(cb.equal(root.get<QuizStatus>("status"), it))
         }
-
         cb.and(*predicates.toTypedArray())
     }
 }
@@ -93,10 +89,13 @@ class QuizService(
     }
 
     fun getQuizWithQuestions(quizId: String): QuizWithQuestionsDto {
+        logger.info("Fetching quiz with Id : $quizId")
         val quiz = quizRepository.findByQuizId(quizId)
             ?: throw QuizNotFoundException("Quiz Not Found")
 
-        val questions = questionRepository.findByQuizQuizId(quizId) // ✅ Corrected repository call
+        logger.info("Quiz found: ${quiz.quizName}")
+
+        val questions = questionRepository.findByQuizQuizId(quizId)
 
         val quizDto = QuizDTO(
             quizId = quiz.quizId,
@@ -118,6 +117,7 @@ class QuizService(
             )
         }
 
+        logger.info("Returning QuizWithQuestionsDto for quiz ID: $quizId")
         return QuizWithQuestionsDto(
             quiz = quizDto,
             questions = questionDtos
@@ -132,6 +132,7 @@ class QuizService(
         endDate: LocalDateTime?,
         status: QuizStatus?
     ): List<QuizDTO> {
+
         val sort = Sort.by(Sort.Direction.ASC, sortBy ?: "createdAt")
         val spec = quizSpecification(search, startDate, endDate, status)
         val quizzes = quizRepository.findAll(spec, sort)
