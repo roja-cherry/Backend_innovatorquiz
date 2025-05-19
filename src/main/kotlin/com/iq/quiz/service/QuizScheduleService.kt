@@ -69,7 +69,7 @@ class QuizScheduleService(
             status = ScheduleStatus.PUBLISHED,
         )
         val saved = scheduleRepository.save(schedule)
-//        logger.info("Quiz published and schedule created with ID: ${saved.scheduleId}")
+        logger.info("Quiz published and schedule created with ID: ${saved.id}")
         return scheduleToDto(saved)
     }
 
