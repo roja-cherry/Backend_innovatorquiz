@@ -1,11 +1,19 @@
 package com.iq.quiz.service
 
+import com.iq.quiz.Dto.ScheduleDto
+import com.iq.quiz.Dto.schedule.ScheduleWithQuestionsDto
 import com.iq.quiz.Entity.AnswerSubmission
 import com.iq.quiz.Entity.QuizAttempt
+import com.iq.quiz.Entity.Schedule
 import com.iq.quiz.Repository.*
 import com.iq.quiz.exception.AlreadyAttemptedException
 import com.iq.quiz.Repository.UserRepository
+import com.iq.quiz.exception.ScheduleException
+import com.iq.quiz.mapper.questionToDto
+import com.iq.quiz.mapper.questionToQuestionWithoutAnswerDto
+import com.iq.quiz.mapper.scheduleToDto
 import jakarta.transaction.Transactional
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -15,6 +23,7 @@ class ParticipantService(
     private val submissionRepo: AnswerSubmissionRepository,
     private val questionRepo: QuestionRepository,
     private val userRepo: UserRepository,
+    private val scheduleService: QuizScheduleService,
     private val scheduleRepo: ScheduleRepository
 ) {
 
@@ -75,4 +84,17 @@ class ParticipantService(
         }
         return attemptRepo.save(attempt)
     }
+
+    fun getScheduleWithQuestion(scheduleId: String): ScheduleWithQuestionsDto {
+        val schedule = scheduleService.getScheduleById(scheduleId)
+        val questions = questionRepo.findByQuizQuizId(schedule.quiz.quizId!!)
+
+        return ScheduleWithQuestionsDto(
+            schedule = scheduleToDto(schedule),
+            questions = questions.map { questionToQuestionWithoutAnswerDto(it) },
+            timer = schedule.quiz.timer
+        )
+    }
+
+
 }
