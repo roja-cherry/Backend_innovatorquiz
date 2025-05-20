@@ -94,4 +94,16 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response)
     }
 
+    @ExceptionHandler(AlreadyAttemptedException::class)
+    fun handleAlreadyAttempted(ex: AlreadyAttemptedException): ResponseEntity<ErrorResponse> {
+        logger.error("AlreadyAttemptedException", ex)
+        val error = ErrorResponse(
+            timestamp = LocalDateTime.now(),
+            status    = ex.statusCode.value(),              // ← use statusCode here
+            message   = ex.reason ?: "You have already submitted this quiz."
+        )
+        return ResponseEntity.status(ex.statusCode).body(error)
+    }
+
+
 }
