@@ -1,6 +1,7 @@
 package com.iq.quiz.mapper
 
 import com.iq.quiz.Dto.QuestionDTO
+import com.iq.quiz.Dto.QuestionWithoutAnswerDTO
 import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.ScheduleDto
 import com.iq.quiz.Dto.user.UserDto
@@ -52,6 +53,15 @@ fun quizToQuizDto(quiz: Quiz): QuizDTO {
         status = quiz.status
     )
 }
+
+fun questionToQuestionWithoutAnswerDto(question: Question): QuestionWithoutAnswerDTO = QuestionWithoutAnswerDTO(
+    questionId = question.questionId!!,
+    question = question.question,
+    option1 = question.option1,
+    option2 = question.option2,
+    option3 = question.option3,
+    option4 = question.option4
+)
 
 fun userToDto(user: User): UserDto {
     return UserDto(
