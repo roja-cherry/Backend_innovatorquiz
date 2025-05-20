@@ -1,6 +1,6 @@
-package com.iq.quiz.repository
+package com.iq.quiz.Repository
 
-import com.iq.quiz.entity.User
+import com.iq.quiz.Entity.User
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.*
 
