@@ -103,8 +103,8 @@ class ParticipantService(
 
         return QuizAttemptDTO(
             id = attempt.id!!,
-            userId = attempt.user.userId,
-            userName = attempt.user.userName,
+            userId = attempt.user.userId!!,
+            userName = attempt.user.username,
             scheduleId = attempt.schedule.id!!,
             startedAt = attempt.startedAt,
             finishedAt = attempt.finishedAt,
