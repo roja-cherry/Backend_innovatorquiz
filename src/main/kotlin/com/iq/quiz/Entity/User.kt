@@ -13,6 +13,8 @@ data class User(
     val userName : String,
     val email : String,
     val password : String,
-    val role : String
+
+    @Enumerated(EnumType.STRING)
+    val role : UserRole
 )
 
