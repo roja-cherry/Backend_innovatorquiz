@@ -42,11 +42,18 @@ class ParticipantScheduleController(
         return ResponseEntity.ok(scheduleWithQuestions)
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/attempt/{id}")
     fun getQuizAttempt(@PathVariable id: String): QuizAttemptDTO {
         return participantService.getAttemptById(id)
     }
 
+    @GetMapping("/attempts/{userId}/{scheduleId}")
+    fun getQuizAttemptByUserAndSchedule(
+        @PathVariable userId: String,
+        @PathVariable scheduleId: String,
+    ): QuizAttemptDTO {
+        return participantService.getAttemptByScheduleAndUser(userId,scheduleId)
+    }
 
 
 

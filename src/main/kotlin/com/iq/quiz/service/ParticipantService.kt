@@ -13,8 +13,6 @@ import com.iq.quiz.mapper.scheduleToDto
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Pageable
 
 @Service
 class ParticipantService(
@@ -121,6 +119,22 @@ class ParticipantService(
     }
 
 
+
+    fun getAttemptByScheduleAndUser(userId: String,scheduleId: String): QuizAttemptDTO {
+        val attempt = attemptRepo.findByUserUserIdAndScheduleId(userId,scheduleId)
+            ?: throw NoSuchElementException("No QuizAttempt found for userId=$userId and scheduleId=$scheduleId")
+
+        return QuizAttemptDTO(
+            id = attempt.id!!,
+            userId = attempt.user.userId!!,
+            userName = attempt.user.username,
+            scheduleId = attempt.schedule.id!!,
+            startedAt = attempt.startedAt,
+            finishedAt = attempt.finishedAt,
+            score = attempt.score,
+            maxScore = attempt.maxScore
+        )
+    }
 
 
 
