@@ -113,6 +113,22 @@ class ParticipantService(
         )
     }
 
+    fun getAttemptByScheduleAndUser(userId: String,scheduleId: String): QuizAttemptDTO {
+        val attempt = attemptRepo.findByUserUserIdAndScheduleId(userId,scheduleId)
+            ?: throw NoSuchElementException("No QuizAttempt found for userId=$userId and scheduleId=$scheduleId")
+
+        return QuizAttemptDTO(
+            id = attempt.id!!,
+            userId = attempt.user.userId!!,
+            userName = attempt.user.username,
+            scheduleId = attempt.schedule.id!!,
+            startedAt = attempt.startedAt,
+            finishedAt = attempt.finishedAt,
+            score = attempt.score,
+            maxScore = attempt.maxScore
+        )
+    }
+
 
 
 }

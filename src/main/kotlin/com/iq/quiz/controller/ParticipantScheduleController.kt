@@ -47,6 +47,13 @@ class ParticipantScheduleController(
         return participantService.getAttemptById(id)
     }
 
+    @GetMapping("/attempts/{userId}/{scheduleId}")
+    fun getQuizAttemptByUserAndSchedule(
+        @PathVariable userId: String,
+        @PathVariable scheduleId: String,
+    ): QuizAttemptDTO {
+        return participantService.getAttemptByScheduleAndUser(userId,scheduleId)
+    }
 
 
 
