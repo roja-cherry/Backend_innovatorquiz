@@ -21,4 +21,5 @@ class AuthController(
         val response = authService.loginForSchedule(scheduleId, quizLoginDto)
         return ResponseEntity.ok(response)
     }
+
 }
