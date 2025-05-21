@@ -1,6 +1,7 @@
 package com.iq.quiz.controller
 
 import com.iq.quiz.Dto.QuestionWithoutAnswerDTO
+import com.iq.quiz.Dto.QuizAttemptDTO
 import com.iq.quiz.Dto.schedule.ScheduleWithQuestionsDto
 import com.iq.quiz.Entity.QuizAttempt
 import com.iq.quiz.Entity.Schedule
@@ -35,5 +36,13 @@ class ParticipantScheduleController(
         val scheduleWithQuestions = participantService.getScheduleWithQuestion(scheduleId)
         return ResponseEntity.ok(scheduleWithQuestions)
     }
+
+    @GetMapping("/{id}")
+    fun getQuizAttempt(@PathVariable id: String): QuizAttemptDTO {
+        return participantService.getAttemptById(id)
+    }
+
+
+
 
 }

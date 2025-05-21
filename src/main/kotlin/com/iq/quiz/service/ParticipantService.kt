@@ -1,5 +1,6 @@
 package com.iq.quiz.service
 
+import com.iq.quiz.Dto.QuizAttemptDTO
 import com.iq.quiz.Dto.ScheduleDto
 import com.iq.quiz.Dto.schedule.ScheduleWithQuestionsDto
 import com.iq.quiz.Entity.AnswerSubmission
@@ -95,6 +96,23 @@ class ParticipantService(
             timer = schedule.quiz.timer
         )
     }
+
+    fun getAttemptById(id: String): QuizAttemptDTO {
+        val attempt = attemptRepo.findById(id)
+            .orElseThrow { NoSuchElementException("QuizAttempt with id $id not found") }
+
+        return QuizAttemptDTO(
+            id = attempt.id!!,
+            userId = attempt.user.userId,
+            userName = attempt.user.userName,
+            scheduleId = attempt.schedule.id!!,
+            startedAt = attempt.startedAt,
+            finishedAt = attempt.finishedAt,
+            score = attempt.score,
+            maxScore = attempt.maxScore
+        )
+    }
+
 
 
 }
