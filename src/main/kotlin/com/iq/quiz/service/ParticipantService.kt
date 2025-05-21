@@ -1,20 +1,16 @@
 package com.iq.quiz.service
 
 import com.iq.quiz.Dto.QuizAttemptDTO
-import com.iq.quiz.Dto.ScheduleDto
+import com.iq.quiz.Dto.UserScoreSummary
 import com.iq.quiz.Dto.schedule.ScheduleWithQuestionsDto
 import com.iq.quiz.Entity.AnswerSubmission
 import com.iq.quiz.Entity.QuizAttempt
-import com.iq.quiz.Entity.Schedule
 import com.iq.quiz.Repository.*
 import com.iq.quiz.exception.AlreadyAttemptedException
 import com.iq.quiz.Repository.UserRepository
-import com.iq.quiz.exception.ScheduleException
-import com.iq.quiz.mapper.questionToDto
 import com.iq.quiz.mapper.questionToQuestionWithoutAnswerDto
 import com.iq.quiz.mapper.scheduleToDto
 import jakarta.transaction.Transactional
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -25,7 +21,8 @@ class ParticipantService(
     private val questionRepo: QuestionRepository,
     private val userRepo: UserRepository,
     private val scheduleService: QuizScheduleService,
-    private val scheduleRepo: ScheduleRepository
+    private val scheduleRepo: ScheduleRepository,
+    private val quizAttemptRepository: QuizAttemptRepository
 ) {
 
     /**
@@ -112,6 +109,16 @@ class ParticipantService(
             maxScore = attempt.maxScore
         )
     }
+
+    fun getTop10BySchedule(scheduleId: String): List<UserScoreSummary> {
+        return quizAttemptRepository.findTop10BySchedule(scheduleId)
+    }
+
+    fun getGlobalLeaderboard(): List<UserScoreSummary> {
+        return quizAttemptRepository.findTop10Global()
+    }
+
+
 
     fun getAttemptByScheduleAndUser(userId: String,scheduleId: String): QuizAttemptDTO {
         val attempt = attemptRepo.findByUserUserIdAndScheduleId(userId,scheduleId)
