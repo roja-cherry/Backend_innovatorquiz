@@ -1,11 +1,14 @@
 package com.iq.quiz.service
 
 import com.iq.quiz.Dto.QuizLoginDto
+import com.iq.quiz.Dto.user.LoginRequestDto
 import com.iq.quiz.Dto.user.UserDto
 import com.iq.quiz.Entity.User
 import com.iq.quiz.Entity.UserRole
 import com.iq.quiz.Repository.ScheduleRepository
 import com.iq.quiz.Repository.UserRepository
+import com.iq.quiz.auth.JwtService
+import com.iq.quiz.exception.AuthException
 import com.iq.quiz.exception.ScheduleException
 import com.iq.quiz.mapper.userToDto
 import org.slf4j.Logger
@@ -16,7 +19,8 @@ import org.springframework.stereotype.Service
 @Service
 class AuthService(
     private val userRepository: UserRepository,
-    private val scheduleRepository: ScheduleRepository
+    private val scheduleRepository: ScheduleRepository,
+    private val jwtService: JwtService
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(AuthService::class.java)
@@ -41,5 +45,22 @@ class AuthService(
 
         val savedNewUser = userRepository.save(newUser)
         return userToDto(savedNewUser)
+    }
+
+    fun login(loginRequestDto: LoginRequestDto): String {
+        val user = userRepository.findByEmail(loginRequestDto.email)
+            .orElseThrow { AuthException("User not registered with this email", HttpStatus.NOT_FOUND) }
+
+        if(user.password != loginRequestDto.password) {
+            throw AuthException("Invalid email or password", HttpStatus.BAD_REQUEST)
+        }
+        return jwtService.createToken(user)
+    }
+
+    fun getUserProfile(token: String): UserDto {
+        val claims = jwtService.extractClaims(token)
+        val user = userRepository.findByEmail(claims.subject)
+            .orElseThrow { AuthException("Failed to authenticate user", HttpStatus.NOT_FOUND) }
+        return userToDto(user)
     }
 }

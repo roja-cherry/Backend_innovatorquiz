@@ -8,9 +8,11 @@ import com.iq.quiz.Entity.QuizAttempt
 import com.iq.quiz.Repository.*
 import com.iq.quiz.exception.AlreadyAttemptedException
 import com.iq.quiz.Repository.UserRepository
+import com.iq.quiz.exception.ScheduleException
 import com.iq.quiz.mapper.questionToQuestionWithoutAnswerDto
 import com.iq.quiz.mapper.scheduleToDto
 import jakarta.transaction.Transactional
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 

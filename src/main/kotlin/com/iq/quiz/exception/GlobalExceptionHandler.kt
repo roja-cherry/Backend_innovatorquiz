@@ -105,5 +105,16 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(ex.statusCode).body(error)
     }
 
+    @ExceptionHandler(AuthException::class)
+    fun handleAlreadyAttempted(ex: AuthException): ResponseEntity<ErrorResponse> {
+        logger.trace("AlreadyAttemptedException", ex)
+        val error = ErrorResponse(
+            timestamp = LocalDateTime.now(),
+            status    = ex.status.value(),              // ← use statusCode here
+            message   = ex.message ?: "Error in authenticating user"
+        )
+        return ResponseEntity.status(ex.status).body(error)
+    }
+
 
 }
