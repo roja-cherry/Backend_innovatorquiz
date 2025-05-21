@@ -115,7 +115,7 @@ class ParticipantService(
 
     fun getAttemptByScheduleAndUser(userId: String,scheduleId: String): QuizAttemptDTO {
         val attempt = attemptRepo.findByUserUserIdAndScheduleId(userId,scheduleId)
-            ?: throw NoSuchElementException("No QuizAttempt found for userId=$userId and scheduleId=$scheduleId")
+            ?: throw ScheduleException("No QuizAttempt found for user", HttpStatus.NOT_FOUND)
 
         return QuizAttemptDTO(
             id = attempt.id!!,
