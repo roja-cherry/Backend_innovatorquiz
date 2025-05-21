@@ -1,5 +1,6 @@
 package com.iq.quiz.Entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import java.time.LocalDateTime
 import java.util.*
@@ -16,6 +17,7 @@ data class User(
     @Column(unique = true)
     val email : String,
 
+    @JsonIgnore
     val password : String ?= null,
 
     @Enumerated(EnumType.STRING)
