@@ -25,4 +25,8 @@ data class Schedule(
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)
     val quiz : Quiz,
-)
+) {
+    fun getStatusText(): String {
+        return status.text
+    }
+}

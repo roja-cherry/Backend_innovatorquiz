@@ -4,9 +4,11 @@ import com.iq.quiz.Dto.QuestionDTO
 import com.iq.quiz.Dto.QuestionWithoutAnswerDTO
 import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.ScheduleDto
+import com.iq.quiz.Dto.user.UserDto
 import com.iq.quiz.Entity.Question
 import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.Schedule
+import com.iq.quiz.Entity.User
 
 
 fun scheduleToDto(schedule: Schedule): ScheduleDto {
@@ -51,6 +53,7 @@ fun quizToQuizDto(quiz: Quiz): QuizDTO {
         status = quiz.status
     )
 }
+
 fun questionToQuestionWithoutAnswerDto(question: Question): QuestionWithoutAnswerDTO = QuestionWithoutAnswerDTO(
     questionId = question.questionId!!,
     question = question.question,
@@ -59,3 +62,12 @@ fun questionToQuestionWithoutAnswerDto(question: Question): QuestionWithoutAnswe
     option3 = question.option3,
     option4 = question.option4
 )
+
+fun userToDto(user: User): UserDto {
+    return UserDto(
+        userId = user.userId!!,
+        username = user.username,
+        email = user.email,
+        role = user.role
+    )
+}

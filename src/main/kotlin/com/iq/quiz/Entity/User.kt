@@ -1,6 +1,7 @@
 package com.iq.quiz.Entity
 
 import jakarta.persistence.*
+import java.time.LocalDateTime
 import java.util.*
 
 @Entity
@@ -8,13 +9,23 @@ import java.util.*
 data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val userId : String,
+    val userId : String ?= null,
 
-    val userName : String,
+    val username : String,
+
+    @Column(unique = true)
     val email : String,
-    val password : String,
+
+    val password : String ?= null,
 
     @Enumerated(EnumType.STRING)
-    val role : UserRole
-)
+    val role : UserRole,
+
+    var createdAt: LocalDateTime ?= null
+) {
+    @PrePersist
+    fun addCreatedAt() {
+        createdAt = LocalDateTime.now()
+    }
+}
 
