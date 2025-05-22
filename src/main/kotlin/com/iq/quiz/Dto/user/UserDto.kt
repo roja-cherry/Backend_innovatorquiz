@@ -6,7 +6,7 @@ data class UserDto(
     val userId: String,
     val email: String,
     val username: String,
-    val role: UserRole
+    val role: UserRole,
 ) {
     fun getRoleText(): String {
         return role.text
