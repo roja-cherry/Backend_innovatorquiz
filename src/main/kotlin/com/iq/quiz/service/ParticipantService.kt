@@ -2,9 +2,11 @@ package com.iq.quiz.service
 
 import com.iq.quiz.Dto.QuizAttemptDTO
 import com.iq.quiz.Dto.UserScoreSummary
+import com.iq.quiz.Dto.schedule.HomePageSchedule
 import com.iq.quiz.Dto.schedule.ScheduleWithQuestionsDto
 import com.iq.quiz.Entity.AnswerSubmission
 import com.iq.quiz.Entity.QuizAttempt
+import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.Repository.*
 import com.iq.quiz.exception.AlreadyAttemptedException
 import com.iq.quiz.Repository.UserRepository
@@ -26,6 +28,7 @@ class ParticipantService(
     private val scheduleService: QuizScheduleService,
     private val scheduleRepo: ScheduleRepository,
     private val quizAttemptRepository: QuizAttemptRepository
+
 ) {
 
     /**
@@ -119,6 +122,23 @@ class ParticipantService(
             ?: throw ScheduleException("No QuizAttempt found for user", HttpStatus.NOT_FOUND)
 
         return quizAttemptToDto(attempt)
+    }
+
+
+    fun getUserHomePageSchedules(userId: String): List<HomePageSchedule> {
+        val schedules = scheduleRepo.findByStatusIn(
+            listOf(ScheduleStatus.ACTIVE, ScheduleStatus.COMPLETED)
+        )
+
+        return schedules.map { schedule ->
+            val isAttempted = quizAttemptRepository.existsByUser_UserIdAndScheduleId(userId, schedule.id ?: "")
+            HomePageSchedule(
+                scheduleId = schedule.id ?: "",
+                quizName = schedule.quiz.quizName,
+                status = schedule.status,
+                isAttempted = isAttempted
+            )
+        }
     }
 
 
