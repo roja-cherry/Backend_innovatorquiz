@@ -43,5 +43,8 @@ interface QuizAttemptRepository : JpaRepository<QuizAttempt, String> {
     fun findTop10Global(): List<UserScoreSummary>
 
 
+    fun existsByUser_UserIdAndScheduleId(userId: String, scheduleId: String): Boolean
+
+
 
 }

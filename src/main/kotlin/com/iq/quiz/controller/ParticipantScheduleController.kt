@@ -3,6 +3,7 @@ package com.iq.quiz.controller
 import com.iq.quiz.Dto.QuizLoginDto
 import com.iq.quiz.Dto.QuestionWithoutAnswerDTO
 import com.iq.quiz.Dto.QuizAttemptDTO
+import com.iq.quiz.Dto.schedule.HomePageSchedule
 import com.iq.quiz.Dto.schedule.ScheduleWithQuestionsDto
 import com.iq.quiz.Entity.QuizAttempt
 import com.iq.quiz.Entity.Schedule
@@ -53,6 +54,12 @@ class ParticipantScheduleController(
         @PathVariable scheduleId: String,
     ): QuizAttemptDTO {
         return participantService.getAttemptByScheduleAndUser(userId,scheduleId)
+    }
+
+    @GetMapping("/{userId}/homepage")
+    fun getHomePageSchedules(@PathVariable userId: String): ResponseEntity<List<HomePageSchedule>> {
+        val schedules = participantService.getUserHomePageSchedules(userId)
+        return ResponseEntity.ok(schedules)
     }
 
 
