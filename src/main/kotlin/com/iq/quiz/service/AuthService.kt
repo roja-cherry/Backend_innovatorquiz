@@ -34,7 +34,7 @@ class AuthService(
                 }
 
         }
-        val user = userRepository.findByEmailAndUsername(quizLoginDto.email, quizLoginDto.username)
+        val user = userRepository.findByEmail(quizLoginDto.email)
 
         if(user.isPresent)
             return userToDto(user.get())
