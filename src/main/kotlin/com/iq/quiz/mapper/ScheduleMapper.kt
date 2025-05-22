@@ -1,14 +1,8 @@
 package com.iq.quiz.mapper
 
-import com.iq.quiz.Dto.QuestionDTO
-import com.iq.quiz.Dto.QuestionWithoutAnswerDTO
-import com.iq.quiz.Dto.QuizDTO
-import com.iq.quiz.Dto.ScheduleDto
+import com.iq.quiz.Dto.*
 import com.iq.quiz.Dto.user.UserDto
-import com.iq.quiz.Entity.Question
-import com.iq.quiz.Entity.Quiz
-import com.iq.quiz.Entity.Schedule
-import com.iq.quiz.Entity.User
+import com.iq.quiz.Entity.*
 
 
 fun scheduleToDto(schedule: Schedule): ScheduleDto {
@@ -71,5 +65,21 @@ fun userToDto(user: User): UserDto {
         role = user.role
     )
 }
+
+fun quizAttemptToDto(attempt: QuizAttempt): QuizAttemptDTO {
+    val quizName = attempt.schedule.quiz.quizName // assuming relations exist
+    return QuizAttemptDTO(
+        id = attempt.id,
+        userId = attempt.user.userId,
+        userName = attempt.user.username,
+        scheduleId = attempt.schedule.id,
+        startedAt = attempt.startedAt,
+        finishedAt = attempt.finishedAt,
+        score = attempt.score,
+        maxScore = attempt.maxScore,
+        quizName = quizName
+    )
+}
+
 
 

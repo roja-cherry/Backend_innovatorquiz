@@ -8,9 +8,12 @@ import com.iq.quiz.Entity.QuizAttempt
 import com.iq.quiz.Repository.*
 import com.iq.quiz.exception.AlreadyAttemptedException
 import com.iq.quiz.Repository.UserRepository
+import com.iq.quiz.exception.ScheduleException
 import com.iq.quiz.mapper.questionToQuestionWithoutAnswerDto
+import com.iq.quiz.mapper.quizAttemptToDto
 import com.iq.quiz.mapper.scheduleToDto
 import jakarta.transaction.Transactional
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -98,16 +101,7 @@ class ParticipantService(
         val attempt = attemptRepo.findById(id)
             .orElseThrow { NoSuchElementException("QuizAttempt with id $id not found") }
 
-        return QuizAttemptDTO(
-            id = attempt.id!!,
-            userId = attempt.user.userId!!,
-            userName = attempt.user.username,
-            scheduleId = attempt.schedule.id!!,
-            startedAt = attempt.startedAt,
-            finishedAt = attempt.finishedAt,
-            score = attempt.score,
-            maxScore = attempt.maxScore
-        )
+        return quizAttemptToDto(attempt)
     }
 
     fun getTop10BySchedule(scheduleId: String): List<UserScoreSummary> {
@@ -124,16 +118,7 @@ class ParticipantService(
         val attempt = attemptRepo.findByUserUserIdAndScheduleId(userId,scheduleId)
             ?: throw ScheduleException("No QuizAttempt found for user", HttpStatus.NOT_FOUND)
 
-        return QuizAttemptDTO(
-            id = attempt.id!!,
-            userId = attempt.user.userId!!,
-            userName = attempt.user.username,
-            scheduleId = attempt.schedule.id!!,
-            startedAt = attempt.startedAt,
-            finishedAt = attempt.finishedAt,
-            score = attempt.score,
-            maxScore = attempt.maxScore
-        )
+        return quizAttemptToDto(attempt)
     }
 
 

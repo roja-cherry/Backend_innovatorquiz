@@ -3,14 +3,15 @@ import java.time.LocalDateTime
 
 
 data class QuizAttemptDTO (
-    val id: String,
-    val userId: String,
+    val id: String?,
+    val userId: String?,
     val userName: String,
-    val scheduleId: String,
+    val scheduleId: String?,
     val startedAt: LocalDateTime,
     val finishedAt: LocalDateTime?,
     val score: Int?,
-    val maxScore: Int?
-    )
+    val maxScore: Int? ,
+    val quizName: String
+)
 
 
