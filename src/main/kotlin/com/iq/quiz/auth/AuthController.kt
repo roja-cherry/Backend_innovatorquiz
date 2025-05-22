@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -19,8 +20,8 @@ class AuthController(
     private val authService: AuthService
 ) {
 
-    @PostMapping("/login-for-quiz/{scheduleId}")
-    fun loginForSchedule(@PathVariable scheduleId: String, @RequestBody quizLoginDto: QuizLoginDto): ResponseEntity<UserDto> {
+    @PostMapping("/login-for-quiz/")
+    fun loginForSchedule(@RequestParam scheduleId: String?, @RequestBody quizLoginDto: QuizLoginDto): ResponseEntity<UserDto> {
         val response = authService.loginForSchedule(scheduleId, quizLoginDto)
         return ResponseEntity.ok(response)
     }
@@ -30,5 +31,4 @@ class AuthController(
         val token = authService.login(loginRequestDto)
         return ResponseEntity.ok(token)
     }
-
 }

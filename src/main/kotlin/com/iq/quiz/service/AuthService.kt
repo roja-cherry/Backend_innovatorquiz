@@ -25,13 +25,15 @@ class AuthService(
 
     private val logger: Logger = LoggerFactory.getLogger(AuthService::class.java)
 
-    fun loginForSchedule(scheduleId: String, quizLoginDto: QuizLoginDto): UserDto {
-        val schedule = scheduleRepository.findById(scheduleId)
-            .orElseThrow {
-                logger.debug("Invalid schedule id found for login $scheduleId")
-                ScheduleException("Sorry, quiz schedule not found, please check URL", HttpStatus.BAD_REQUEST)
-            }
+    fun loginForSchedule(scheduleId: String?, quizLoginDto: QuizLoginDto): UserDto {
+        if(scheduleId != null) {
+            scheduleRepository.findById(scheduleId)
+                .orElseThrow {
+                    logger.debug("Invalid schedule id found for login $scheduleId")
+                    ScheduleException("Sorry, quiz schedule not found, please check URL", HttpStatus.BAD_REQUEST)
+                }
 
+        }
         val user = userRepository.findByEmailAndUsername(quizLoginDto.email, quizLoginDto.username)
 
         if(user.isPresent)
