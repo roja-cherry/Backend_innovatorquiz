@@ -1,6 +1,9 @@
 // src/main/kotlin/com/iq/quiz/entity/QuizAttempt.kt
 package com.iq.quiz.Entity
 
+import com.fasterxml.jackson.annotation.JsonBackReference
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import com.iq.quiz.Entity.Schedule
 import com.iq.quiz.Entity.User
 import jakarta.persistence.*
@@ -28,5 +31,9 @@ data class QuizAttempt(
     var score: Int? = null,
 
     /** total questions answered */
-    var maxScore: Int? = null
+    var maxScore: Int? = null,
+
+    @OneToMany(mappedBy = "attempt", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JsonIgnore
+    val answerSubmissions: MutableList<AnswerSubmission> ?= mutableListOf()
 )

@@ -1,5 +1,8 @@
 package com.iq.quiz.Entity
 
+import com.fasterxml.jackson.annotation.JsonBackReference
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 import jakarta.validation.constraints.Future
 import java.time.LocalDateTime
@@ -25,6 +28,10 @@ data class Schedule(
     @ManyToOne
     @JoinColumn(name = "quiz_id", nullable = false)
     val quiz : Quiz,
+
+    @OneToMany(mappedBy = "schedule", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JsonIgnore
+    val quizAttempts: MutableList<QuizAttempt> ?= mutableListOf()
 ) {
     fun getStatusText(): String {
         return status.text

@@ -1,5 +1,7 @@
 package com.iq.quiz.Entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 import java.security.Timestamp
 import java.time.LocalDateTime
@@ -19,7 +21,17 @@ data class Quiz(
     val createdAt: LocalDateTime,
 
     @Enumerated(EnumType.STRING)
-    var status: QuizStatus
+    var status: QuizStatus,
+
+    @OneToMany(mappedBy = "quiz", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JsonIgnore
+    val questions: MutableList<Question> ?= mutableListOf(),
+
+    @OneToMany(mappedBy = "quiz", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JsonIgnore
+    val schedules: MutableList<Schedule> ?= mutableListOf()
+
+
 ){
     fun getStatusText(): String {
         return status.text

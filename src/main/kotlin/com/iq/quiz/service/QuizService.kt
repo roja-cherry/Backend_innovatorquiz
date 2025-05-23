@@ -196,11 +196,11 @@ class QuizService(
             )
         }
 
-        val schedulesDeleted = scheduleRepository.deleteAllByQuizQuizId(quizId)
-        logger.info("Deleted {} schedules for quizId='{}'", schedulesDeleted, quizId)
-
-        val questionsDeleted = questionRepository.deleteAllByQuizQuizId(quizId)
-        logger.info("Deleted {} questions for quizId='{}'", questionsDeleted, quizId)
+//        val schedulesDeleted = scheduleRepository.deleteAllByQuizQuizId(quizId)
+//        logger.info("Deleted {} schedules for quizId='{}'", schedulesDeleted, quizId)
+//
+//        val questionsDeleted = questionRepository.deleteAllByQuizQuizId(quizId)
+//        logger.info("Deleted {} questions for quizId='{}'", questionsDeleted, quizId)
 
         quizRepository.deleteById(quizId)
         logger.info("Quiz deletion completed for quizId='{}'", quizId)
@@ -224,10 +224,10 @@ class QuizService(
         }
     }
 
-    fun searchQuizzes(keyword: String): List<QuizDTO> {
+    fun searchQuizzes(keyword: String): List<Quiz> {
         logger.info("searchQuizzes() called with keyword='{}'", keyword)
         val results = quizRepository.searchByKeyword(keyword)
         logger.info("searchQuizzes: found {} results", results.size)
-        return results.map { quizToQuizDto(it) }
+        return results
     }
 }

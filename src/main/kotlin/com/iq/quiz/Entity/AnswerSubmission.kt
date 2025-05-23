@@ -1,5 +1,6 @@
 package com.iq.quiz.Entity
 
+import com.fasterxml.jackson.annotation.JsonBackReference
 import com.iq.quiz.Entity.Question
 import com.iq.quiz.Entity.QuizAttempt
 import jakarta.persistence.*
