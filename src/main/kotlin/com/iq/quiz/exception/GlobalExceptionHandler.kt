@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import java.time.LocalDateTime
@@ -22,6 +23,17 @@ fun getDuplicateFieldMessage(msg: String): String {
     }
     return "An error occurred!"
 }
+
+data class ValidationErrorResponse(
+    val status: Int,
+    val message: String = "Field errors",
+    val errors: List<FieldValidationError>
+)
+
+data class FieldValidationError(
+    val field: String,
+    val error: String
+)
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
@@ -106,7 +118,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AuthException::class)
-    fun handleAlreadyAttempted(ex: AuthException): ResponseEntity<ErrorResponse> {
+    fun handleAuthException(ex: AuthException): ResponseEntity<ErrorResponse> {
         logger.trace("AlreadyAttemptedException", ex)
         val error = ErrorResponse(
             timestamp = LocalDateTime.now(),
@@ -114,6 +126,24 @@ class GlobalExceptionHandler {
             message   = ex.message ?: "Error in authenticating user"
         )
         return ResponseEntity.status(ex.status).body(error)
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ResponseEntity<ValidationErrorResponse> {
+        logger.trace("AlreadyAttemptedException", ex)
+        val fieldErrors = ex.bindingResult.fieldErrors.map { fieldError ->
+            FieldValidationError(
+                field = fieldError.field,
+                error = fieldError.defaultMessage ?: "Invalid value"
+            )
+        }
+
+        val response = ValidationErrorResponse(
+            status = HttpStatus.BAD_REQUEST.value(),
+            errors = fieldErrors
+        )
+
+        return ResponseEntity(response, HttpStatus.BAD_REQUEST)
     }
 
 
