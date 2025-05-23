@@ -8,6 +8,7 @@ import com.iq.quiz.Entity.ScheduleStatus
 import com.iq.quiz.service.QuizScheduleService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import jakarta.validation.Valid
 
 @RestController
 @RequestMapping("/api/schedule")
@@ -22,7 +23,7 @@ class QuizScheduleController(
     }
 
     @PostMapping
-    fun publishQuiz(@RequestBody request: PublishQuizRequest): ResponseEntity<ScheduleDto> {
+    fun publishQuiz(@RequestBody  @Valid request: PublishQuizRequest): ResponseEntity<ScheduleDto> {
         val result = scheduleService.publishQuiz(request)
         return ResponseEntity.ok(result)
     }
@@ -42,7 +43,7 @@ class QuizScheduleController(
     @PatchMapping("/{scheduleId}/reschedule")
     fun reschedule(
         @PathVariable scheduleId: String,
-        @RequestBody reschedule:ScheduleEditCreateRequest
+        @RequestBody  @Valid reschedule:ScheduleEditCreateRequest
     ):ResponseEntity<ScheduleDto>{
         val response=scheduleService.reschedule(scheduleId,reschedule)
         return ResponseEntity.ok(response)
