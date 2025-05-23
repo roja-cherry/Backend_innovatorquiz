@@ -5,9 +5,7 @@ import com.iq.quiz.Dto.QuizDTO
 import com.iq.quiz.Dto.QuizWithQuestionsDto
 import com.iq.quiz.Entity.Quiz
 import com.iq.quiz.Entity.QuizStatus
-import com.iq.quiz.Repository.QuestionRepository
-import com.iq.quiz.Repository.QuizRepository
-import com.iq.quiz.Repository.ScheduleRepository
+import com.iq.quiz.Repository.*
 import com.iq.quiz.exception.FileFormatException
 import com.iq.quiz.exception.QuizException
 import com.iq.quiz.exception.QuizNotFoundException
@@ -58,7 +56,9 @@ class QuizService(
     private val quizRepository: QuizRepository,
     private val scheduleRepository: ScheduleRepository,
     private val questionRepository: QuestionRepository,
-    private val excelService: ExcelService
+    private val excelService: ExcelService,
+    private val quizAttemptRepository: QuizAttemptRepository,
+    private val answerSubmissionRepository: AnswerSubmissionRepository
 ) {
     private val logger: Logger = LoggerFactory.getLogger(QuizService::class.java)
 
@@ -181,6 +181,7 @@ class QuizService(
     @Transactional
     fun deleteQuiz(quizId: String) {
         logger.info("deleteQuiz() called for quizId='{}'", quizId)
+
         val quiz = quizRepository.findById(quizId)
             .orElseThrow {
                 logger.error("deleteQuiz: quiz not found id='{}'", quizId)
@@ -188,7 +189,8 @@ class QuizService(
             }
         logger.debug("Found quiz to delete: {} (status={})", quiz.quizName, quiz.status)
 
-        if (quiz.status != QuizStatus.CREATED && quiz.status != QuizStatus.COMPLETED) {
+        // only allow deletion if CREATED or COMPLETED
+        if (quiz.status !in listOf(QuizStatus.CREATED, QuizStatus.COMPLETED)) {
             logger.warn("deleteQuiz: cannot delete quizId='{}' with status='{}'", quizId, quiz.status)
             throw QuizException(
                 "Only quizzes with status 'Created' or 'Completed' can be deleted. Current status: ${quiz.status.text}",
@@ -196,15 +198,31 @@ class QuizService(
             )
         }
 
+        // 1) delete AnswerSubmissions for all attempts of this quiz
+        val attempts = quizAttemptRepository.findAllByScheduleQuizQuizId(quizId)
+        val attemptIds = attempts.mapNotNull { it.id }
+        if (attemptIds.isNotEmpty()) {
+            val submissionsDeleted = answerSubmissionRepository.deleteAllByAttemptIdIn(attemptIds)
+            logger.info("Deleted {} answer submissions for quizId='{}'", submissionsDeleted, quizId)
+        }
+
+        // 2) delete QuizAttempts
+        val attemptsDeleted = quizAttemptRepository.deleteAllByScheduleQuizQuizId(quizId)
+        logger.info("Deleted {} quiz attempts for quizId='{}'", attemptsDeleted, quizId)
+
+        // 3) delete Schedules
         val schedulesDeleted = scheduleRepository.deleteAllByQuizQuizId(quizId)
         logger.info("Deleted {} schedules for quizId='{}'", schedulesDeleted, quizId)
 
+        // 4) delete Questions
         val questionsDeleted = questionRepository.deleteAllByQuizQuizId(quizId)
         logger.info("Deleted {} questions for quizId='{}'", questionsDeleted, quizId)
 
+        // 5) finally delete the Quiz
         quizRepository.deleteById(quizId)
         logger.info("Quiz deletion completed for quizId='{}'", quizId)
     }
+
 
     fun getAllQuizzesForAdmin(status: QuizStatus?): List<QuizDTO> {
         logger.info("getAllQuizzesForAdmin() called with status='{}'", status)

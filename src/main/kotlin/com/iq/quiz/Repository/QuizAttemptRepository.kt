@@ -45,6 +45,8 @@ interface QuizAttemptRepository : JpaRepository<QuizAttempt, String> {
 
     fun existsByUser_UserIdAndScheduleId(userId: String, scheduleId: String): Boolean
 
+    fun findAllByScheduleQuizQuizId(quizId: String): List<QuizAttempt>
+    fun deleteAllByScheduleQuizQuizId(quizId: String): Int
 
 
 }
