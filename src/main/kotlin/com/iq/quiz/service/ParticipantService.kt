@@ -43,23 +43,23 @@ class ParticipantService(
         scheduleId: String,
         answers: Map<String, String>
     ): QuizAttempt {
-        // 1) load user & schedule
+        //load user & schedule
         val user = userRepo.findById(userId)
             .orElseThrow { RuntimeException("User $userId not found") }
         val schedule = scheduleRepo.findById(scheduleId)
             .orElseThrow { RuntimeException("Schedule $scheduleId not found") }
 
-        // ① Check for an existing, already‑finished attempt
+        //Check for an existing, already‑finished attempt
         val existing = attemptRepo.findByUserUserIdAndScheduleId(userId, scheduleId)
         if (existing != null && existing.finishedAt != null) {
             throw AlreadyAttemptedException("User $userId has already submitted this quiz.")
         }
 
-        // ② If none (or in‑progress only), go on to record answers…
+        //If none (or in‑progress only), go on to record answers…
         val attempt = existing
             ?: attemptRepo.save(QuizAttempt(user = user, schedule = schedule))
 
-        // 3) record each answer
+        //record each answer
         answers.forEach { (qId, selectedText) ->
             val question = questionRepo.findById(qId)
                 .orElseThrow { RuntimeException("Question $qId not found") }
@@ -75,12 +75,13 @@ class ParticipantService(
             )
         }
 
-        // 4) compute final score
-        val subs          = submissionRepo.findAllByAttemptId(attempt.id!!)
-        val totalQuestions = subs.size
-        val correctCount   = subs.count { it.correct }
+        //compute final score correctly
+        val subs = submissionRepo.findAllByAttemptId(attempt.id!!)
+        val correctCount = subs.count { it.correct }
+        val totalQuestions = questionRepo.findAllByQuizQuizId(schedule.quiz.quizId!!).size
 
-        // 5) update and persist attempt
+
+        //update and persist attempt
         attempt.apply {
             finishedAt = LocalDateTime.now()
             score      = correctCount

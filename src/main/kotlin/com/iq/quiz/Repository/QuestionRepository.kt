@@ -10,4 +10,8 @@ interface QuestionRepository : JpaRepository<Question, String> {
 
     @Modifying
     fun deleteAllByQuizQuizId(id: String)
+
+    fun findAllByQuizQuizId(quizId: String): List<Question>
+
+
 }
