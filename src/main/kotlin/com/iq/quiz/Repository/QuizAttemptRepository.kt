@@ -16,7 +16,8 @@ interface QuizAttemptRepository : JpaRepository<QuizAttempt, String> {
 
     @Query(
         value = """
-        SELECT qa.user_id AS userId, u.username AS userName, SUM(qa.score) AS totalScore
+        SELECT qa.user_id AS userId, u.username AS userName, 
+               COALESCE(SUM(qa.score), 0) AS totalScore
         FROM quiz_attempts qa
         JOIN users u ON qa.user_id = u.user_id
         WHERE qa.schedule_id = :scheduleId
@@ -31,7 +32,8 @@ interface QuizAttemptRepository : JpaRepository<QuizAttempt, String> {
 
     @Query(
         value = """
-        SELECT qa.user_id AS userId, u.username AS userName, SUM(qa.score) AS totalScore
+        SELECT qa.user_id AS userId, u.username AS userName, 
+               COALESCE(SUM(qa.score), 0) AS totalScore
         FROM quiz_attempts qa
         JOIN users u ON qa.user_id = u.user_id
         GROUP BY qa.user_id, u.username
@@ -41,6 +43,7 @@ interface QuizAttemptRepository : JpaRepository<QuizAttempt, String> {
         nativeQuery = true
     )
     fun findTop10Global(): List<UserScoreSummary>
+
 
 
     fun existsByUser_UserIdAndScheduleId(userId: String, scheduleId: String): Boolean

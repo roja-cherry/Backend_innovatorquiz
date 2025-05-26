@@ -142,6 +142,27 @@ class ParticipantService(
         }
     }
 
+    /**
+     * Creates (or returns) an in‑progress QuizAttempt without scoring it.
+     */
+    @Transactional
+    fun createAttempt(userId: String, scheduleId: String): QuizAttempt {
+        // 1. Load user & schedule like in submitAndScore
+        val user = userRepo.findById(userId)
+            .orElseThrow { RuntimeException("User $userId not found") }
+        val schedule = scheduleRepo.findById(scheduleId)
+            .orElseThrow { RuntimeException("Schedule $scheduleId not found") }
+
+        // 2. If there's an existing attempt that isn’t finished, just return it
+        val existing = attemptRepo.findByUserUserIdAndScheduleId(userId, scheduleId)
+        if (existing != null && existing.finishedAt == null) {
+            return existing
+        }
+        // 3. Otherwise, create a fresh attempt
+        return attemptRepo.save(QuizAttempt(user = user, schedule = schedule))
+    }
+
+
 
 
 }

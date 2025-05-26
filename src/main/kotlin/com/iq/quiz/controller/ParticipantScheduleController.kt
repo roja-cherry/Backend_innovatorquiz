@@ -62,6 +62,16 @@ class ParticipantScheduleController(
         return ResponseEntity.ok(schedules)
     }
 
+    @PostMapping("/create-attempt")
+    fun createAttempt(
+        @RequestParam userId: String,
+        @RequestParam scheduleId: String
+    ): QuizAttempt {
+        return participantService.createAttempt(userId, scheduleId)
+    }
+
+
+
 
 
 }
