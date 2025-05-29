@@ -21,8 +21,8 @@ class AuthController(
 ) {
 
     @PostMapping("/login-for-quiz/")
-    fun loginForSchedule(@RequestParam scheduleId: String?, @RequestBody quizLoginDto: QuizLoginDto): ResponseEntity<UserDto> {
-        val response = authService.loginForSchedule(scheduleId, quizLoginDto)
+    fun loginForSchedule(@RequestBody quizLoginDto: QuizLoginDto): ResponseEntity<UserDto> {
+        val response = authService.loginForSchedule(quizLoginDto)
         return ResponseEntity.ok(response)
     }
 
